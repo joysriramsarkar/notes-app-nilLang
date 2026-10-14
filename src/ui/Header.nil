@@ -1,0 +1,51 @@
+// src/ui/Header.nil
+// নীলাং নোট অ্যাপ — হেডার ও নেভিগেশন বার
+
+import "../domain/theme.nil" as Theme;
+
+// টার্মিনাল হেডার ও সার্চ বার রেন্ডার করা
+let renderHeader = fn(activeCategory, searchQuery, totalCount) {
+    let out = Theme.formatTerminalHeader("dark") + "\n";
+    let catText = " [ক্যাটাগরি: " + activeCategory + "]";
+    let searchStatus = "";
+    if (searchQuery != "") {
+        searchStatus = " 🔍 খোঁজা হচ্ছে: '" + searchQuery + "'";
+    }
+    out = out + Theme.ANSI_FG_YELLOW + "📌 মোট নোট: " + str(totalCount) + catText + searchStatus + Theme.ANSI_RESET + "\n";
+    out = out + Theme.ANSI_DIM + "──────────────────────────────────────────────────────────────────" + Theme.ANSI_RESET;
+    return out;
+};
+
+// Alap UI ডিক্লারেটিভ কম্পোনেন্ট কাঠামো
+let renderAlapHeader = fn(title, onSearchChange, onNewNoteClick) {
+    return {
+        "type": "Row",
+        "padding": 16,
+        "background": "#1E293B",
+        "borderBottom": {"width": 1, "color": "#334155"},
+        "children": [
+            {
+                "type": "Text",
+                "text": "📝 " + title,
+                "fontSize": 20,
+                "fontWeight": "bold",
+                "color": "#F8FAFC",
+                "grow": true
+            },
+            {
+                "type": "Input",
+                "placeholder": "🔍 নোট খুঁজুন...",
+                "width": 260,
+                "onChange": onSearchChange
+            },
+            {
+                "type": "Button",
+                "text": "+ নতুন নোট",
+                "variant": "primary",
+                "background": "#6366F1",
+                "color": "#FFFFFF",
+                "onClick": onNewNoteClick
+            }
+        ]
+    };
+};

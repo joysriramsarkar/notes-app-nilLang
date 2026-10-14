@@ -1,0 +1,82 @@
+// src/domain/markdown.nil
+// নীলাং নোট অ্যাপ — মার্কডাউন প্রসেসিং ও টেক্সট মেট্রিক্স
+
+// শব্দের সংখ্যা গণনা
+let countWords = fn(text) {
+    let t = trim(text);
+    if (t == "") {
+        return 0;
+    }
+    let parts = split(t, " ");
+    let count = 0;
+    let i = 0;
+    while (i < len(parts)) {
+        if (trim(parts[i]) != "") {
+            count = count + 1;
+        }
+        i = i + 1;
+    }
+    return count;
+};
+
+// অক্ষরের সংখ্যা গণনা
+let countChars = fn(text) {
+    return len(text);
+};
+
+// আনুমানিক পড়ার সময় (মিনিট)
+let calcReadingTime = fn(wordCount) {
+    if (wordCount < 50) {
+        return "< ১ মিনিট";
+    }
+    let min = wordCount / 180;
+    if (min < 1) {
+        return "১ মিনিট";
+    }
+    return str(min) + " মিনিট";
+};
+
+// নোটের সংক্ষিপ্ত অংশ (Excerpt) তৈরি
+let getExcerpt = fn(text, maxLen) {
+    let t = trim(text);
+    if (len(t) <= maxLen) {
+        return t;
+    }
+    return substr(t, 0, maxLen) + "...";
+};
+
+// তারিখ সুন্দর করে ফরম্যাট করা
+let formatDate = fn(timestamp) {
+    if (timestamp == 0) {
+        return "নতুন";
+    }
+    // সেকেন্ড ভিত্তিক আপেক্ষিক সময়
+    let current = time();
+    let diff = current - timestamp;
+    if (diff < 60) {
+        return "এইমাত্র";
+    }
+    if (diff < 3600) {
+        let mins = diff / 60;
+        return str(mins) + " মিনিট আগে";
+    }
+    if (diff < 86400) {
+        let hours = diff / 3600;
+        return str(hours) + " ঘণ্টা আগে";
+    }
+    let days = diff / 86400;
+    return str(days) + " দিন আগে";
+};
+
+// নোট মেটাডাটা অ্যানালাইসিস
+let analyzeNote = fn(title, content, checklist) {
+    let words = countWords(content) + countWords(title);
+    let chars = countChars(content) + countChars(title);
+    let reading = calcReadingTime(words);
+    return {
+        "words": words,
+        "chars": chars,
+        "readingTime": reading,
+        "checklistCount": len(checklist)
+    };
+};

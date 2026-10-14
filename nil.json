@@ -1,0 +1,36 @@
+{
+  "name": "notes-app-nilLang",
+  "version": "1.0.0",
+  "description": "আধুনিক নোট অ্যাপ — সম্পূর্ণ নীলাং (NilLang) ও আলাপ (Alap) ফ্রেমওয়ার্কে তৈরি",
+  "author": "Joyshriram Sarkar",
+  "license": "AGPL-3.0",
+  "entry": "src/main.nil",
+  "main": "src/main.nil",
+  "targets": ["windows", "linux", "onuron", "android", "web"],
+  "window": {
+    "title": "নীলাং নোটবুক (Nilang Notes)",
+    "width": 1100,
+    "height": 720,
+    "resizable": true,
+    "minWidth": 640,
+    "minHeight": 480
+  },
+  "capabilities": [
+    "Filesystem",
+    "Database",
+    "Network",
+    "Stdout",
+    "Stdin",
+    "Clock"
+  ],
+  "features": {
+    "markdown": true,
+    "checklists": true,
+    "categories": true,
+    "tags": true,
+    "search": true,
+    "themes": true,
+    "analytics": true,
+    "qemuReady": true
+  }
+}

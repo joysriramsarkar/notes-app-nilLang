@@ -1,0 +1,162 @@
+// src/notes_app.nil
+// নীলাং নোট অ্যাপ — Alap ফ্রেমওয়ার্ক ডিক্লারেটিভ UI কম্পোনেন্ট
+// Targets: Windows, Linux, Android, Onuron, QEMU
+
+@Entry
+@Component
+component NotesApp {
+    @State appTitle: string = "নীলাং নোটবুক (Nilang Notes)"
+    @State activeCategory: string = "all"
+    @State searchQuery: string = ""
+    @State activeNoteTitle: string = "স্বাগতম নীলাং নোটবুক-এ!"
+    @State noteCount: i32 = 4
+    @State totalWords: i32 = 145
+    @State currentTheme: string = "dark"
+    @State statusMsg: string = "সিস্টেম প্রস্তুত (Ready)"
+
+    build() {
+        Column {
+            // ১. টপ হেডার বার
+            Row {
+                Text(appTitle)
+                    .fontSize(22)
+                    .fontWeight("bold")
+                    .color("#FFFFFF")
+
+                Text(statusMsg)
+                    .fontSize(14)
+                    .color("#94A3B8")
+            }
+            .backgroundColor("#1E293B")
+            .padding({ horizontal: 20, vertical: 14 })
+            .width("100%")
+
+            // ২. মূল ৩-কলাম লেআউট (Sidebar + NoteList + Editor)
+            Row {
+                // সাইডবার ফোল্ডার মেনু
+                Column {
+                    Text("📁 ক্যাটাগরি")
+                        .fontSize(16)
+                        .fontWeight("bold")
+                        .color("#F8FAFC")
+                        .margin({ bottom: 12 })
+
+                    Button("📑 সকল নোট (4)") {
+                        onClick => {
+                            activeCategory = "all"
+                            statusMsg = "সকল নোট প্রদর্শিত হচ্ছে"
+                        }
+                    }
+                    .backgroundColor("#334155")
+                    .color("#FFFFFF")
+                    .margin({ bottom: 6 })
+
+                    Button("⭐ জরুরি নোট (2)") {
+                        onClick => {
+                            activeCategory = "important"
+                            statusMsg = "জরুরি নোট ফিল্টার করা হয়েছে"
+                        }
+                    }
+                    .backgroundColor("transparent")
+                    .color("#94A3B8")
+                    .margin({ bottom: 6 })
+
+                    Button("✅ চেকলিস্ট ও টাস্ক (1)") {
+                        onClick => {
+                            activeCategory = "todo"
+                            statusMsg = "টাস্ক তালিকা ফিল্টার করা হয়েছে"
+                        }
+                    }
+                    .backgroundColor("transparent")
+                    .color("#94A3B8")
+                    .margin({ bottom: 6 })
+
+                    Button("💡 আইডিয়া ও পরিকল্পনা (1)") {
+                        onClick => {
+                            activeCategory = "ideas"
+                            statusMsg = "আইডিয়া তালিকা ফিল্টার করা হয়েছে"
+                        }
+                    }
+                    .backgroundColor("transparent")
+                    .color("#94A3B8")
+                }
+                .width("220px")
+                .backgroundColor("#0F172A")
+                .padding(16)
+
+                // নোট তালিকা
+                Column {
+                    Text("নোটের তালিকা")
+                        .fontSize(16)
+                        .fontWeight("bold")
+                        .color("#F8FAFC")
+                        .margin({ bottom: 10 })
+
+                    Row {
+                        Text("📝 স্বাগতম নীলাং নোটবুক-এ! 📌")
+                            .fontSize(15)
+                            .fontWeight("bold")
+                            .color("#6366F1")
+                    }
+                    .padding(10)
+                    .backgroundColor("#1E293B")
+                    .margin({ bottom: 6 })
+
+                    Row {
+                        Text("📝 দৈনিক কাজের পরিকল্পনা ও ডেডলাইন 📌")
+                            .fontSize(15)
+                            .color("#E2E8F0")
+                    }
+                    .padding(10)
+                    .backgroundColor("#111827")
+                    .margin({ bottom: 6 })
+
+                    Row {
+                        Text("📝 অনুরণ ওএস: মাইক্রোকার্নেল আর্কিটেকচার")
+                            .fontSize(15)
+                            .color("#E2E8F0")
+                    }
+                    .padding(10)
+                    .backgroundColor("#111827")
+                }
+                .width("320px")
+                .backgroundColor("#111827")
+                .padding(16)
+
+                // নোট এডিটর ও ডিটেইলস
+                Column {
+                    Text(activeNoteTitle)
+                        .fontSize(24)
+                        .fontWeight("bold")
+                        .color("#F8FAFC")
+                        .margin({ bottom: 8 })
+
+                    Text("ক্যাটাগরি: important | ট্যাগ: #নীলাং #গাইড #অনুরণ")
+                        .fontSize(13)
+                        .color("#A855F7")
+                        .margin({ bottom: 14 })
+
+                    Text("নীলাং ভাষায় তৈরি আধুনিক, দ্রুতগতির এবং সুন্দর নোট অ্যাপ্লিকেশন।\n\nবৈশিষ্ট্য:\n- লাইভ সার্চ ও ফিল্টারিং\n- প্রতিটি নোটে কালার ব্যাজ\n- QEMU ভার্চুয়াল মেশিনে সরাসরি এক্সিকিউশন সাপোর্ট")
+                        .fontSize(15)
+                        .color("#CBD5E1")
+                        .lineHeight(1.6)
+                        .margin({ bottom: 20 })
+
+                    Row {
+                        Button("+ নতুন নোট") {
+                            onClick => {
+                                statusMsg = "নতুন নোট তৈরি হয়েছে"
+                            }
+                        }
+                        .backgroundColor("#6366F1")
+                        .color("#FFFFFF")
+                        .padding({ horizontal: 16, vertical: 8 })
+                    }
+                }
+                .width("60%")
+                .backgroundColor("#0B0F19")
+                .padding(24)
+            }
+        }
+    }
+}

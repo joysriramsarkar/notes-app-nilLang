@@ -1,0 +1,154 @@
+// src/ui/NoteEditor.nil
+// নীলাং নোট অ্যাপ — নোট এডিটর ও বিস্তারিত ভিউয়ার
+
+import "../domain/theme.nil" as Theme;
+import "../domain/markdown.nil" as Markdown;
+import "../domain/checklist.nil" as Checklist;
+
+// টার্মিনালে নির্বাচিত নোটের পূর্ণ বিবরণ রেন্ডার
+let renderNoteDetail = fn(note) {
+    if (note == null) {
+        return Theme.ANSI_FG_YELLOW + "  (কোনো নোট নির্বাচিত নেই)\n" + Theme.ANSI_RESET;
+    }
+
+    let out = "";
+    let border = "═";
+    let b = "";
+    let i = 0;
+    while (i < 60) {
+        b = b + border;
+        i = i + 1;
+    }
+
+    // নোট হেডার
+    let pinStr = note["isPinned"] ? " [📌 PINNED]" : "";
+    let favStr = note["isFavorite"] ? " [⭐ FAVORITE]" : "";
+    out = out + Theme.ANSI_FG_BRIGHT_CYAN + "╭" + b + "╮\n" + Theme.ANSI_RESET;
+    out = out + Theme.ANSI_BOLD + Theme.ANSI_FG_WHITE + "  📝 শিরোনাম: " + note["title"] + pinStr + favStr + Theme.ANSI_RESET + "\n";
+    out = out + Theme.ANSI_DIM + "  📁 ক্যাটাগরি: " + note["category"] + " | 🎨 রঙ: " + note["color"] + " | ⏰ আপডেট: " + Markdown.formatDate(note["updatedAt"]) + Theme.ANSI_RESET + "\n";
+
+    // ট্যাগসমূহ
+    let tagStr = "";
+    let t = 0;
+    let tags = note["tags"];
+    while (t < len(tags)) {
+        tagStr = tagStr + " #" + tags[t];
+        t = t + 1;
+    }
+    if (tagStr != "") {
+        out = out + Theme.ANSI_FG_MAGENTA + "  🏷️  ট্যাগসমূহ: " + tagStr + Theme.ANSI_RESET + "\n";
+    }
+
+    out = out + Theme.ANSI_FG_BRIGHT_CYAN + "├" + b + "┤\n" + Theme.ANSI_RESET;
+
+    // বিবরণ / কনটেন্ট
+    out = out + Theme.ANSI_FG_WHITE + "  " + replace(note["content"], "\n", "\n  ") + "\n" + Theme.ANSI_RESET;
+
+    // চেকলিস্ট
+    let checks = note["checklist"];
+    if (len(checks) > 0) {
+        out = out + "\n" + Theme.ANSI_BOLD + Theme.ANSI_FG_BRIGHT_GREEN + "  ✅ চেকলিস্ট / টু-ডু আইটেম:" + Theme.ANSI_RESET + "\n";
+        let c = 0;
+        while (c < len(checks)) {
+            let item = checks[c];
+            let mark = item["completed"] ? "[✔]" : "[ ]";
+            let itemColor = item["completed"] ? Theme.ANSI_DIM + Theme.ANSI_FG_GREEN : Theme.ANSI_FG_WHITE;
+            out = out + "    (" + str(c + 1) + ") " + itemColor + mark + " " + item["text"] + Theme.ANSI_RESET + "\n";
+            c = c + 1;
+        }
+        let prog = Checklist.calcProgress(checks);
+        out = out + "    " + Theme.ANSI_FG_BRIGHT_YELLOW + "অগ্রগতি: " + prog["progressBar"] + Theme.ANSI_RESET + "\n";
+    }
+
+    // মেটাডাটা ও অ্যানালাইসিস
+    let analysis = Markdown.analyzeNote(note["title"], note["content"], checks);
+    out = out + Theme.ANSI_FG_BRIGHT_CYAN + "├" + b + "┤\n" + Theme.ANSI_RESET;
+    out = out + Theme.ANSI_DIM + "  📊 মেট্রিক্স: " + str(analysis["words"]) + " শব্দ | " + str(analysis["chars"]) + " অক্ষর | পড়ার সময়: " + analysis["readingTime"] + Theme.ANSI_RESET + "\n";
+    out = out + Theme.ANSI_FG_BRIGHT_CYAN + "╰" + b + "╯\n" + Theme.ANSI_RESET;
+
+    return out;
+};
+
+// Alap UI ডিক্লারেটিভ নোট এডিটর কম্পোনেন্ট
+let renderAlapNoteEditor = fn(note, onTitleChange, onContentChange, onPinClick, onFavClick, onDeleteClick) {
+    if (note == null) {
+        return {
+            "type": "Column",
+            "fill": true,
+            "padding": 32,
+            "align": "center",
+            "justify": "center",
+            "background": "#0B1120",
+            "children": [
+                {"type": "Text", "text": "📝 কোনো নোট নির্বাচিত নেই", "fontSize": 18, "color": "#64748B"}
+            ]
+        };
+    }
+
+    let checklistChildren = [];
+    let checks = note["checklist"];
+    let c = 0;
+    while (c < len(checks)) {
+        let chk = checks[c];
+        checklistChildren = append(checklistChildren, {
+            "type": "Row",
+            "margin": {"bottom": 4},
+            "children": [
+                {"type": "Checkbox", "checked": chk["completed"]},
+                {"type": "Text", "text": chk["text"], "color": chk["completed"] ? "#64748B" : "#F8FAFC", "fontSize": 14}
+            ]
+        });
+        c = c + 1;
+    }
+
+    return {
+        "type": "Column",
+        "fill": true,
+        "background": "#0B1120",
+        "padding": 20,
+        "children": [
+            // একশন বার
+            {
+                "type": "Row",
+                "margin": {"bottom": 12},
+                "children": [
+                    {"type": "Button", "text": note["isPinned"] ? "📌 পিন্ড" : "📌 পিন", "variant": note["isPinned"] ? "primary" : "ghost", "onClick": onPinClick},
+                    {"type": "Button", "text": note["isFavorite"] ? "⭐ ফেভারিট" : "⭐ স্টার", "variant": note["isFavorite"] ? "primary" : "ghost", "onClick": onFavClick},
+                    {"type": "Spacer"},
+                    {"type": "Button", "text": "🗑️ ডিলিট", "variant": "danger", "onClick": onDeleteClick}
+                ]
+            },
+            // শিরোনাম ইনপুট
+            {
+                "type": "Input",
+                "value": note["title"],
+                "fontSize": 20,
+                "fontWeight": "bold",
+                "placeholder": "নোটের শিরোনাম...",
+                "width": "100%",
+                "margin": {"bottom": 12},
+                "onChange": onTitleChange
+            },
+            // কনটেন্ট টেক্সট এরিয়া
+            {
+                "type": "TextArea",
+                "value": note["content"],
+                "placeholder": "এখানে বিস্তারিত নোট লিখুন...",
+                "fill": true,
+                "fontSize": 15,
+                "lineHeight": 1.6,
+                "margin": {"bottom": 12},
+                "onChange": onContentChange
+            },
+            // চেকলিস্ট কন্টেইনার
+            {
+                "type": "Column",
+                "background": "#1E293B",
+                "padding": 12,
+                "borderRadius": 8,
+                "children": checklistChildren
+            }
+        ]
+    };
+};
+

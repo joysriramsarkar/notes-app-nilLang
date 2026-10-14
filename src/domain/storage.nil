@@ -1,0 +1,152 @@
+// src/domain/storage.nil
+// নীলাং নোট অ্যাপ — ডেটাবেস ও ফাইল সংরক্ষণ ইঞ্জিন
+
+import "./types.nil" as Types;
+import "./checklist.nil" as Checklist;
+
+// স্টার্টার নোট তৈরি (Initial Seed Notes)
+let getSeedNotes = fn() {
+    let notes = [];
+
+    // নোট ১: স্বাগতম ও ফিচার গাইড
+    let n1Checks = [];
+    n1Checks = append(n1Checks, Checklist.createCheckItem("chk-1", "ক্যাটাগরি ও ট্যাগ দিয়ে নোট সাজানো", true));
+    n1Checks = append(n1Checks, Checklist.createCheckItem("chk-2", "ইন্টারেক্টিভ চেকলিস্ট ও টাস্ক তৈরি", true));
+    n1Checks = append(n1Checks, Checklist.createCheckItem("chk-3", "QEMU এমুলেটরে ভার্চুয়াল ওএস টেস্ট করা", true));
+    n1Checks = append(n1Checks, Checklist.createCheckItem("chk-4", "অটো-সেভ ও ডেটা রিকভারি যাচাই করা", false));
+
+    let n1 = Types.createNote(
+        "note-1",
+        "স্বাগতম নীলাং নোটবুক-এ! (Nilang Notes Guide)",
+        "নীলাং ভাষায় তৈরি আধুনিক, দ্রুতগতির এবং সুন্দর নোট অ্যাপ্লিকেশন।\n\nপ্রধান সুবিধাসমূহ:\n- সম্পূর্ণ বাংলায় ও ইংরেজিতে নোট সংরক্ষণ\n- লাইভ সার্চ ও ক্যাটাগরি ফিল্টারিং\n- প্রতিটি নোটে কালার ব্যাজ ও প্রায়োরিটি\n- সম্পূর্ণ ক্রস-প্ল্যাটফর্ম (Windows, Linux, Onuron, QEMU)",
+        "important",
+        ["নীলাং", "গাইড", "নোটবুক", "অনুরণ"],
+        "indigo",
+        "high",
+        true,
+        true,
+        n1Checks
+    );
+    notes = append(notes, n1);
+
+    // নোট ২: আজকের কাজের তালিকা
+    let n2Checks = [];
+    n2Checks = append(n2Checks, Checklist.createCheckItem("chk-21", "নীলাং কোডবেজ রিফ্যাক্টরিং", true));
+    n2Checks = append(n2Checks, Checklist.createCheckItem("chk-22", "আলাপ UI ডিক্লারেটিভ কম্পোনেন্ট তৈরি", true));
+    n2Checks = append(n2Checks, Checklist.createCheckItem("chk-23", "QEMU x86_64 কার্নেল বুট টেস্ট", true));
+    n2Checks = append(n2Checks, Checklist.createCheckItem("chk-24", "রিসার্চ পেপার ড্রাফট রিভিশন", false));
+
+    let n2 = Types.createNote(
+        "note-2",
+        "দৈনিক কাজের পরিকল্পনা ও ডেডলাইন",
+        "আজকের সর্বোচ্চ অগ্রাধিকারের কাজগুলো সম্পন্ন করতে হবে। সন্ধ্যে ৬টার মধ্যে বিল্ড টেস্ট সমাপ্ত করা দরকার।",
+        "todo",
+        ["কাজ", "প্ল্যানিং", "টাস্ক"],
+        "emerald",
+        "high",
+        true,
+        false,
+        n2Checks
+    );
+    notes = append(notes, n2);
+
+    // নোট ৩: সফটওয়্যার আর্কিটেকচার আইডিয়া
+    let n3Checks = [];
+    n3Checks = append(n3Checks, Checklist.createCheckItem("chk-31", "মাইক্রো-কার্নেল ড্রাইভার ডিজাইন", true));
+    n3Checks = append(n3Checks, Checklist.createCheckItem("chk-32", "জিরো-কপি IPC মেমোরি চ্যানেল", false));
+
+    let n3 = Types.createNote(
+        "note-3",
+        "অনুরণ ওএস: মাইক্রোকার্নেল আর্কিটেকচার আইডিয়া",
+        "অনুরণ অপারেটিং সিস্টেমে আল্ট্রা-লাইটওয়েট প্রসেস আইসোলেশন ও সফটবাস (SoftBus) আর্কিটেকচার বাস্তবায়ন করা।\n\nলক্ষ্য:\n১. দ্রুততম রেসপন্স টাইম (< 2ms)\n২. সুরক্ষিত মেমোরি স্যান্ডবক্সিং\n৩. নীলাং বাইটকোড ডিরেক্ট এক্সিকিউশন",
+        "ideas",
+        ["আর্কিটেকচার", "ওএস", "রিসার্চ"],
+        "cyan",
+        "medium",
+        false,
+        true,
+        n3Checks
+    );
+    notes = append(notes, n3);
+
+    // নোট ৪: প্রিয় বই ও উক্তি
+    let n4 = Types.createNote(
+        "note-4",
+        "অনুপ্রেরণাদায়ক উক্তি ও জ্ঞান",
+        "\"জ্ঞানের চেয়ে কল্পনাশক্তি অধিক গুরুত্বপূর্ণ, কারণ জ্ঞান সীমাবদ্ধ, কিন্তু কল্পনা জগতকে আলিঙ্গন করে।\" — অ্যালবার্ট আইনস্টাইন\n\nবইয়ের তালিকা:\n১. Clean Code (Robert C. Martin)\n২. Designing Data-Intensive Applications",
+        "personal",
+        ["উক্তি", "বই", "শিক্ষা"],
+        "violet",
+        "low",
+        false,
+        false,
+        []
+    );
+    notes = append(notes, n4);
+
+    return notes;
+};
+
+// মেমোরি থেকে সরল নোট ডেটা কনভার্ট করা
+let notesToJSON = fn(notes) {
+    let out = "[\n";
+    let i = 0;
+    while (i < len(notes)) {
+        let n = notes[i];
+        out = out + "  {\n";
+        out = out + "    \"id\": \"" + n["id"] + "\",\n";
+        out = out + "    \"title\": \"" + replace(n["title"], "\"", "\\\"") + "\",\n";
+        out = out + "    \"content\": \"" + replace(replace(n["content"], "\n", "\\n"), "\"", "\\\"") + "\",\n";
+        out = out + "    \"category\": \"" + n["category"] + "\",\n";
+        out = out + "    \"color\": \"" + n["color"] + "\",\n";
+        out = out + "    \"priority\": \"" + n["priority"] + "\",\n";
+        out = out + "    \"isPinned\": " + (n["isPinned"] ? "true" : "false") + ",\n";
+        out = out + "    \"isFavorite\": " + (n["isFavorite"] ? "true" : "false") + ",\n";
+        out = out + "    \"isArchived\": " + (n["isArchived"] ? "true" : "false") + ",\n";
+        out = out + "    \"isTrashed\": " + (n["isTrashed"] ? "true" : "false") + ",\n";
+        out = out + "    \"createdAt\": " + str(n["createdAt"]) + ",\n";
+        out = out + "    \"updatedAt\": " + str(n["updatedAt"]) + ",\n";
+
+        // Tags
+        out = out + "    \"tags\": [";
+        let t = 0;
+        while (t < len(n["tags"])) {
+            out = out + "\"" + n["tags"][t] + "\"";
+            if (t + 1 < len(n["tags"])) {
+                out = out + ", ";
+            }
+            t = t + 1;
+        }
+        out = out + "],\n";
+
+        // Checklist
+        out = out + "    \"checklist\": [\n";
+        let c = 0;
+        let checks = n["checklist"];
+        while (c < len(checks)) {
+            let item = checks[c];
+            out = out + "      {\"id\": \"" + item["id"] + "\", \"text\": \"" + replace(item["text"], "\"", "\\\"") + "\", \"completed\": " + (item["completed"] ? "true" : "false") + "}";
+            if (c + 1 < len(checks)) {
+                out = out + ",";
+            }
+            out = out + "\n";
+            c = c + 1;
+        }
+        out = out + "    ]\n";
+
+        out = out + "  }";
+        if (i + 1 < len(notes)) {
+            out = out + ",";
+        }
+        out = out + "\n";
+        i = i + 1;
+    }
+    out = out + "]\n";
+    return out;
+};
+
+// ডেটা সেভ করা
+let saveNotesToFile = fn(notes, filePath) {
+    let jsonContent = notesToJSON(notes);
+    return writeFile(filePath, jsonContent);
+};

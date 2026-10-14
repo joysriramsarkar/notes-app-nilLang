@@ -1,0 +1,146 @@
+[
+  {
+    "id": "note-1",
+    "title": "স্বাগতম নীলাং নোটবুক-এ! (Nilang Notes Guide)",
+    "content": "নীলাং ভাষায় তৈরি আধুনিক, দ্রুতগতির এবং সুন্দর নোট অ্যাপ্লিকেশন।\n\nপ্রধান সুবিধাসমূহ:\n- সম্পূর্ণ বাংলায় ও ইংরেজিতে নোট সংরক্ষণ\n- লাইভ সার্চ ও ক্যাটাগরি ফিল্টারিং\n- প্রতিটি নোটে কালার ব্যাজ ও প্রায়োরিটি\n- সম্পূর্ণ ক্রস-প্ল্যাটফর্ম (Windows, Linux, Onuron, QEMU)টাস্ক ",
+    "category": "important",
+    "tags": [
+      "নীলাং",
+      "গাইড",
+      "নোটবুক",
+      "অনুরণ"
+    ],
+    "color": "indigo",
+    "priority": "high",
+    "isPinned": true,
+    "isFavorite": true,
+    "isArchived": false,
+    "isTrashed": false,
+    "checklist": [
+      {
+        "id": "chk-1",
+        "text": "ক্যাটাগরি ও ট্যাগ দিয়ে নোট সাজানো",
+        "completed": true
+      },
+      {
+        "id": "chk-2",
+        "text": "ইন্টারেক্টিভ চেকলিস্ট ও টাস্ক তৈরি",
+        "completed": true
+      },
+      {
+        "id": "chk-3",
+        "text": "QEMU এমুলেটরে ভার্চুয়াল ওএস টেস্ট করা",
+        "completed": true
+      },
+      {
+        "id": "chk-4",
+        "text": "অটো-সেভ ও ডেটা রিকভারি যাচাই করা",
+        "completed": true
+      }
+    ],
+    "createdAt": 1791359508,
+    "updatedAt": 1791360098
+  },
+  {
+    "id": "note-2",
+    "title": "দৈনিক কাজের পরিকল্পনা ও ডেডলাইন",
+    "content": "আজকের সর্বোচ্চ অগ্রাধিকারের কাজগুলো সম্পন্ন করতে হবে। সন্ধ্যে ৬টার মধ্যে বিল্ড টেস্ট সমাপ্ত করা দরকার।",
+    "category": "todo",
+    "tags": [
+      "কাজ",
+      "প্ল্যানিং",
+      "টাস্ক"
+    ],
+    "color": "emerald",
+    "priority": "high",
+    "isPinned": true,
+    "isFavorite": false,
+    "isArchived": false,
+    "isTrashed": false,
+    "checklist": [
+      {
+        "id": "chk-21",
+        "text": "নীলাং কোডবেজ রিফ্যাক্টরিং",
+        "completed": true
+      },
+      {
+        "id": "chk-22",
+        "text": "আলাপ UI ডিক্লারেটিভ কম্পোনেন্ট তৈরি",
+        "completed": true
+      },
+      {
+        "id": "chk-23",
+        "text": "QEMU x86_64 কার্নেল বুট টেস্ট",
+        "completed": true
+      },
+      {
+        "id": "chk-24",
+        "text": "রিসার্চ পেপার ড্রাফট রিভিশন",
+        "completed": false
+      },
+      {
+        "id": "chk-1791359606764",
+        "text": "গেম খেলা।",
+        "completed": false
+      }
+    ],
+    "createdAt": 1791359508,
+    "updatedAt": 1791359607
+  },
+  {
+    "id": "note-3",
+    "title": "অনুরণ ওএস: মাইক্রোকার্নেল আর্কিটেকচার আইডিয়া",
+    "content": "অনুরণ অপারেটিং সিস্টেমে আল্ট্রা-লাইটওয়েট প্রসেস আইসোলেশন ও সফটবাস (SoftBus) আর্কিটেকচার বাস্তবায়ন করা।\n\nলক্ষ্য:\n১. দ্রুততম রেসপন্স টাইম (\u003c 2ms)\n২. সুরক্ষিত মেমোরি স্যান্ডবক্সিং জ ে\n৩. নীলাং বাইটকোড ডিরেক্ট এক্সিকিউশনজততপ৯৯\nhjhkkhlnjb\nmvvkvkh\n\n",
+    "category": "ideas",
+    "tags": [
+      "আর্কিটেকচার",
+      "ওএস",
+      "রিসার্চ"
+    ],
+    "color": "cyan",
+    "priority": "medium",
+    "isPinned": false,
+    "isFavorite": true,
+    "isArchived": false,
+    "isTrashed": false,
+    "checklist": [
+      {
+        "id": "chk-31",
+        "text": "মাইক্রো-কার্নেল ড্রাইভার ডিজাইন",
+        "completed": true
+      },
+      {
+        "id": "chk-32",
+        "text": "জিরো-কপি IPC মেমোরি চ্যানেল",
+        "completed": true
+      },
+      {
+        "id": "chk-1791424697022",
+        "text": "kjhk",
+        "completed": false
+      }
+    ],
+    "createdAt": 1791359508,
+    "updatedAt": 1791424706
+  },
+  {
+    "id": "note-4",
+    "title": "অনুপ্রেরণাদায়ক উক্তি ও জ্ঞান",
+    "content": "\"জ্ঞানের চেয়ে কল্পনাশক্তি অধিক গুরুত্বপূর্ণ, কারণ জ্ঞান সীমাবদ্ধ, কিন্তু কল্পনা জগতকে আলিঙ্গন করে।\" — অ্যালবার্ট আইনস্টাইন\n\nবইয়ের তালিকা:\n১. Clean Code (Robert C. Martin)\n২. Designing Data-Intensive Applications",
+    "category": "personal",
+    "tags": [
+      "উক্তি",
+      "বই",
+      "শিক্ষা"
+    ],
+    "color": "violet",
+    "priority": "low",
+    "isPinned": false,
+    "isFavorite": false,
+    "isArchived": false,
+    "isTrashed": false,
+    "checklist": [],
+    "createdAt": 1791359508,
+    "updatedAt": 1791359508
+  }
+]

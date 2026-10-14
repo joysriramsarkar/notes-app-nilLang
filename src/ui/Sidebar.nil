@@ -1,0 +1,60 @@
+// src/ui/Sidebar.nil
+// নীলাং নোট অ্যাপ — সাইডবার মেনু ও ফোল্ডার ভিউ
+
+import "../domain/types.nil" as Types;
+import "../domain/theme.nil" as Theme;
+
+// টার্মিনাল সাইডবার রেন্ডার
+let renderSidebar = fn(activeCategory, activeNotesCount, trashedCount) {
+    let categories = Types.getCategoryList();
+    let out = Theme.ANSI_BOLD + "📂 ফোল্ডার ও ক্যাটাগরি:\n" + Theme.ANSI_RESET;
+
+    let i = 0;
+    while (i < len(categories)) {
+        let cat = categories[i];
+        let prefix = "  ";
+        let color = Theme.ANSI_FG_WHITE;
+
+        if (cat["id"] == activeCategory) {
+            prefix = "▶ ";
+            color = Theme.ANSI_FG_BRIGHT_CYAN + Theme.ANSI_BOLD;
+        }
+
+        out = out + color + prefix + cat["icon"] + " " + cat["name"] + " (" + cat["nameEn"] + ")" + Theme.ANSI_RESET + "\n";
+        i = i + 1;
+    }
+
+    return out;
+};
+
+// Alap ডিক্লারেটিভ সাইডবার কম্পোনেন্ট
+let renderAlapSidebar = fn(activeCategory, onSelectCategory) {
+    let categories = Types.getCategoryList();
+    let buttons = [];
+
+    let i = 0;
+    while (i < len(categories)) {
+        let cat = categories[i];
+        let isSelected = (cat["id"] == activeCategory);
+        let btn = {
+            "type": "Button",
+            "text": cat["icon"] + " " + cat["name"],
+            "variant": isSelected ? "filled" : "ghost",
+            "background": isSelected ? "#334155" : "transparent",
+            "color": isSelected ? "#38BDF8" : "#94A3B8",
+            "width": "100%",
+            "textAlign": "left",
+            "onClick": fn() { onSelectCategory(cat["id"]); }
+        };
+        buttons = append(buttons, btn);
+        i = i + 1;
+    }
+
+    return {
+        "type": "Column",
+        "width": 240,
+        "background": "#0F172A",
+        "padding": 12,
+        "children": buttons
+    };
+};

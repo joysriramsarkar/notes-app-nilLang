@@ -1,0 +1,59 @@
+// src/domain/theme.nil
+// নীলাং নোট অ্যাপ — থিম ও কালার ইঞ্জিন
+
+let THEME_DARK = "dark";
+let THEME_CYBER = "cyber";
+let THEME_EMERALD = "emerald";
+let THEME_BANGLA = "bangla";
+let THEME_LIGHT = "light";
+
+// ANSI কালার কোড
+let ANSI_RESET = "\033[0m";
+let ANSI_BOLD = "\033[1m";
+let ANSI_DIM = "\033[2m";
+let ANSI_UNDERLINE = "\033[4m";
+
+let ANSI_FG_BLACK = "\033[30m";
+let ANSI_FG_RED = "\033[31m";
+let ANSI_FG_GREEN = "\033[32m";
+let ANSI_FG_YELLOW = "\033[33m";
+let ANSI_FG_BLUE = "\033[34m";
+let ANSI_FG_MAGENTA = "\033[35m";
+let ANSI_FG_CYAN = "\033[36m";
+let ANSI_FG_WHITE = "\033[37m";
+
+let ANSI_FG_BRIGHT_BLUE = "\033[94m";
+let ANSI_FG_BRIGHT_CYAN = "\033[96m";
+let ANSI_FG_BRIGHT_GREEN = "\033[92m";
+let ANSI_FG_BRIGHT_YELLOW = "\033[93m";
+let ANSI_FG_BRIGHT_MAGENTA = "\033[95m";
+
+let ANSI_BG_DARK_BLUE = "\033[44m";
+let ANSI_BG_DARK_CYAN = "\033[46m";
+let ANSI_BG_DARK_GRAY = "\033[100m";
+
+// থিমের তালিকা
+let getThemeList = fn() {
+    let list = [];
+    list = append(list, {"id": "dark", "name": "ডিপ নাইট / Deep Night", "primary": "#6366F1", "bg": "#0F172A", "surface": "#1E293B", "text": "#F8FAFC"});
+    list = append(list, {"id": "cyber", "name": "সাইবার পাঙ্ক / Cyberpunk", "primary": "#06B6D4", "bg": "#090D16", "surface": "#111827", "text": "#E0F2FE"});
+    list = append(list, {"id": "emerald", "name": "সবুজ প্রকৃতি / Emerald", "primary": "#10B981", "bg": "#06281E", "surface": "#0B3D2E", "text": "#ECFDF5"});
+    list = append(list, {"id": "bangla", "name": "লাল-সবুজ ঐতিহ্য / Bangla", "primary": "#E11D48", "bg": "#052014", "surface": "#0C3A24", "text": "#FFF1F2"});
+    list = append(list, {"id": "light", "name": "উজ্জ্বল ক্লিন / Pure Clean", "primary": "#2563EB", "bg": "#F8FAFC", "surface": "#FFFFFF", "text": "#0F172A"});
+    return list;
+};
+
+// টার্মিনাল হেডার ফরম্যাট করা
+let formatTerminalHeader = fn(themeName) {
+    let border = "═";
+    let b = "";
+    let i = 0;
+    while (i < 64) {
+        b = b + border;
+        i = i + 1;
+    }
+    return ANSI_FG_BRIGHT_CYAN + ANSI_BOLD + "╔" + b + "╗\n" +
+           "║        📝 নীলাং নোটবুক (NILANG NOTES v1.0) • QEMU READY        ║\n" +
+           "║           মডার্ন রিচ টেক্সট, চেকলিস্ট ও ডেটাবেস সমৃদ্ধ নোট           ║\n" +
+           "╚" + b + "╝" + ANSI_RESET;
+};
