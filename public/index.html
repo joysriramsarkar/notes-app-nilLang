@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>নীলাং নোটবুক (Nilang Windows Notes)</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --panel: #111827;
+      --card: #1e293b;
+      --border: #334155;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Nirmala UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    header {
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .brand span.badge {
+      font-size: 11px;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input.search {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: 8px;
+      width: 260px;
+      outline: none;
+    }
+    button {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 13px;
+      transition: 0.15s ease;
+    }
+    button:hover { background: #283548; }
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+    button.primary:hover { background: var(--accent-hover); }
+    button.danger {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: 220px 320px 1fr;
+      flex: 1;
+      overflow: hidden;
+    }
+    .sidebar {
+      background: #0f172a;
+      border-right: 1px solid var(--border);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cat-btn {
+      text-align: left;
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .cat-btn.active, .cat-btn:hover {
+      background: var(--card);
+      color: var(--text);
+    }
+    .stats-box {
+      margin-top: auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .note-list {
+      background: var(--panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .note-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+    }
+    .note-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+    .note-card h4 {
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .note-card p {
+      font-size: 12px;
+      color: var(--muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .editor {
+      padding: 20px 28px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .editor-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .title-input {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 24px;
+      font-weight: 700;
+      width: 100%;
+      outline: none;
+    }
+    .meta-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .meta-row select, .meta-row input {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+    textarea.content-input {
+      flex: 1;
+      min-height: 240px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      line-height: 1.65;
+      resize: none;
+      outline: none;
+    }
+    .checklist-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      font-size: 14px;
+    }
+    footer.statusbar {
+      background: #0f172a;
+      border-top: 1px solid var(--border);
+      padding: 6px 18px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span>📝 নীলাং উইন্ডোজ নোটস (Nilang Notes)</span>
+      <span class="badge">NilLang + Alap Desktop</span>
+    </div>
+    <div class="top-actions">
+      <input id="searchInput" class="search" type="text" placeholder="🔍 নোট বা ট্যাগ খুঁজুন (Ctrl+K)..." oninput="renderList()" />
+      <button class="primary" onclick="createNewNote()">➕ নতুন নোট</button>
+      <button onclick="saveCurrentNote()">💾 সেভ (Ctrl+S)</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <button class="cat-btn active" data-cat="all" onclick="setCategory('all')">📑 সকল নোট</button>
+      <button class="cat-btn" data-cat="important" onclick="setCategory('important')">📌 জরুরি ও পিন্ড</button>
+      <button class="cat-btn" data-cat="work" onclick="setCategory('work')">💼 কাজ (Work)</button>
+      <button class="cat-btn" data-cat="personal" onclick="setCategory('personal')">🏠 ব্যক্তিগত</button>
+      <button class="cat-btn" data-cat="ideas" onclick="setCategory('ideas')">💡 আইডিয়া</button>
+      <button class="cat-btn" data-cat="todo" onclick="setCategory('todo')">✅ চেকলিস্ট</button>
+
+      <div class="stats-box" id="statsBox">
+        📊 পরিসংখ্যান লোড হচ্ছে...
+      </div>
+    </aside>
+
+    <section class="note-list" id="noteList"></section>
+
+    <main class="editor">
+      <div class="editor-toolbar">
+        <div class="meta-row">
+          <label>ক্যাটাগরি:</label>
+          <select id="noteCategory" onchange="saveCurrentNote()">
+            <option value="important">important</option>
+            <option value="work">work</option>
+            <option value="personal">personal</option>
+            <option value="ideas">ideas</option>
+            <option value="todo">todo</option>
+          </select>
+          <label>ট্যাগ:</label>
+          <input id="noteTags" type="text" placeholder="নীলাং, নোট" onchange="saveCurrentNote()" />
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="pinBtn" onclick="togglePin()">📌 পিন</button>
+          <button id="favBtn" onclick="toggleFav()">⭐ ফেভারিট</button>
+          <button class="danger" onclick="deleteCurrentNote()">🗑️ মুছুন</button>
+        </div>
+      </div>
+
+      <input id="noteTitle" class="title-input" type="text" placeholder="নোটের শিরোনাম লিখুন..." />
+      <textarea id="noteContent" class="content-input" placeholder="এখানে আপনার নোট লিখুন..."></textarea>
+
+      <div class="checklist-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <strong>✅ চেকলিস্ট ও টাস্ক</strong>
+          <div style="display:flex; gap:6px;">
+            <input id="newCheckText" type="text" placeholder="নতুন টাস্ক লিখুন..." style="background:#1e293b;border:1px solid #334155;color:#fff;padding:4px 8px;border-radius:6px;" />
+            <button onclick="addCheckItem()">+ যোগ</button>
+          </div>
+        </div>
+        <div id="checklistContainer"></div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="statusbar">
+    <span id="statusText">সিস্টেম প্রস্তুত (Ready)</span>
+    <span id="wordCountText">০ শব্দ | ০ অক্ষর • UTF-8 • NilLang v0.1</span>
+  </footer>
+
+  <script>
+    let notes = [];
+    let activeCategory = 'all';
+    let activeNoteId = null;
+
+    async function loadNotes() {
+      const res = await fetch('/api/notes');
+      notes = await res.json();
+      if (!activeNoteId && notes.length > 0) {
+        activeNoteId = notes[0].id;
+      }
+      renderList();
+      renderEditor();
+      loadStats();
+    }
+
+    async function loadStats() {
+      const res = await fetch('/api/analytics');
+      const s = await res.json();
+      document.getElementById('statsBox').innerHTML = `
+        <strong>📊 নোটবুক মেট্রিক্স</strong><br/>
+        • সক্রিয় নোট: <b>${s.activeNotes}</b> / ${s.totalNotes}<br/>
+        • পিন্ড: <b>${s.pinnedNotes}</b> | ⭐ <b>${s.favoriteNotes}</b><br/>
+        • মোট শব্দ: <b>${s.totalWords}</b><br/>
+        • টাস্ক সম্পন্ন: <b>${s.todoProgress}%</b> (${s.completedTodos}/${s.totalTodos})
+      `;
+    }
+
+    function setCategory(cat) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.cat === cat);
+      });
+      renderList();
+    }
+
+    function getFiltered() {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      return notes.filter(n => {
+        if (n.isTrashed) return false;
+        if (activeCategory === 'important' && !n.isPinned && !n.isFavorite) return false;
+        if (activeCategory !== 'all' && activeCategory !== 'important' && n.category !== activeCategory) return false;
+        if (q && !n.title.toLowerCase().includes(q) && !n.content.toLowerCase().includes(q)) return false;
+        return true;
+      });
+    }
+
+    function renderList() {
+      const list = document.getElementById('noteList');
+      const filtered = getFiltered();
+      list.innerHTML = filtered.map(n => `
+        <div class="note-card ${n.id === activeNoteId ? 'active' : ''}" onclick="selectNote('${n.id}')">
+          <h4>${n.isPinned ? '📌 ' : ''}${n.isFavorite ? '⭐ ' : ''}${n.title}</h4>
+          <p>${n.content || ''}</p>
+        </div>
+      `).join('');
+    }
+
+    function selectNote(id) {
+      activeNoteId = id;
+      renderList();
+      renderEditor();
+    }
+
+    function getActiveNote() {
+      return notes.find(n => n.id === activeNoteId) || null;
+    }
+
+    function renderEditor() {
+      const n = getActiveNote();
+      if (!n) return;
+      document.getElementById('noteTitle').value = n.title || '';
+      document.getElementById('noteContent').value = n.content || '';
+      document.getElementById('noteCategory').value = n.category || 'personal';
+      document.getElementById('noteTags').value = (n.tags || []).join(', ');
+      const words = ((n.title || '') + ' ' + (n.content || '')).trim().split(/\s+/).filter(Boolean).length;
+      const chars = (n.title || '').length + (n.content || '').length;
+      document.getElementById('wordCountText').textContent = `${words} শব্দ | ${chars} অক্ষর • UTF-8 • NilLang v0.1`;
+
+      const checks = n.checklist || [];
+      document.getElementById('checklistContainer').innerHTML = checks.map(c => `
+        <label class="check-item">
+          <input type="checkbox" ${c.completed ? 'checked' : ''} onchange="toggleCheck('${c.id}')" />
+          <span style="${c.completed ? 'text-decoration:line-through;color:#64748b;' : ''}">${c.text}</span>
+        </label>
+      `).join('');
+    }
+
+    async function saveCurrentNote() {
+      const n = getActiveNote();
+      if (!n) return;
+      n.title = document.getElementById('noteTitle').value;
+      n.content = document.getElementById('noteContent').value;
+      n.category = document.getElementById('noteCategory').value;
+      n.tags = document.getElementById('noteTags').value.split(',').map(t => t.trim()).filter(Boolean);
+      await fetch(`/api/notes/${n.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(n)
+      });
+      document.getElementById('statusText').textContent = '✅ নোট সংরক্ষিত হয়েছে: ' + n.title;
+      await loadNotes();
+    }
+
+    async function createNewNote() {
+      const res = await fetch('/api/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: 'নতুন উইন্ডোজ নোট',
+          content: 'এখানে আপনার নোটের বিস্তারিত লিখুন...',
+          category: activeCategory === 'all' ? 'personal' : activeCategory,
+          tags: ['নীলাং', 'নোট'],
+          color: 'indigo',
+          priority: 'medium',
+          checklist: []
+        })
+      });
+      const created = await res.json();
+      activeNoteId = created.id;
+      await loadNotes();
+    }
+
+    async function togglePin() {
+      const n = getActiveNote();
+      if (!n) return;
+      await fetch(`/api/notes/${n.id}/pin`, { method: 'POST' });
+      await loadNotes();
+    }
+
+    async function toggleFav() {
+      const n = getActiveNote();
+      if (!n) return;
+      await fetch(`/api/notes/${n.id}/favorite`, { method: 'POST' });
+      await loadNotes();
+    }
+
+    async function toggleCheck(checkId) {
+      const n = getActiveNote();
+      if (!n) return;
+      await fetch(`/api/notes/${n.id}/toggle-checklist/${checkId}`, { method: 'POST' });
+      await loadNotes();
+    }
+
+    async function addCheckItem() {
+      const n = getActiveNote();
+      const input = document.getElementById('newCheckText');
+      if (!n || !input.value.trim()) return;
+      n.checklist = n.checklist || [];
+      n.checklist.push({ id: 'chk-' + Date.now(), text: input.value.trim(), completed: false });
+      input.value = '';
+      await saveCurrentNote();
+    }
+
+    async function deleteCurrentNote() {
+      const n = getActiveNote();
+      if (!n) return;
+      await fetch(`/api/notes/${n.id}`, { method: 'DELETE' });
+      activeNoteId = null;
+      await loadNotes();
+    }
+
+    window.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        saveCurrentNote();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        document.getElementById('searchInput').focus();
+      }
+    });
+
+    loadNotes();
+  </script>
+</body>
+</html>

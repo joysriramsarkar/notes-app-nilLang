@@ -22,9 +22,29 @@ let main = fn() {
         if (raw == null) { return ""; }
         return raw;
     };
+    let safeParseInt = fn(s) {
+        if (s == null || s == "") { return -1; }
+        let i = 0;
+        while (i < len(s)) {
+            if (!contains("0123456789", s[i])) {
+                return -1;
+            }
+            i = i + 1;
+        }
+        return int(s);
+    };
     let engine = Notes.createNotesEngine();
     let currentTheme = "dark";
     let showStats = false;
+
+    // উইন্ডোজে ইন্টারঅ্যাক্টিভভাবে চালালে সরাসরি আদর্শ মিনিমাল Win32 নোটপ্যাড উইন্ডো খুলবে
+    let notepadConfig = {
+        "appTitle": "নীলাং নোটপ্যাড",
+        "initialText": ""
+    };
+    if (native("__nil_win32_notes_gui", notepadConfig)) {
+        return null;
+    }
 
     // Alap ডিক্লারেটিভ গ্রাফিক্যাল UI ট্রি (Graphical GUI Tree for Android, Onuron & Desktop)
     let buildUI = fn() {
@@ -155,9 +175,9 @@ let main = fn() {
         }
         let cmd = trim(rawCmd);
 
-        if (cmd == "q" || cmd == "exit" || cmd == "quit") {
+        if (cmd == "q" || cmd == "exit" || cmd == "quit" || cmd == "বের" || cmd == "বন্ধ") {
             running = false;
-        } else if (cmd == "n" || cmd == "new") {
+        } else if (cmd == "n" || cmd == "new" || cmd == "নতুন") {
             // নতুন নোট তৈরি
             puts(Theme.ANSI_BOLD + "\n--- 📝 নতুন নোট তৈরি করুন ---" + Theme.ANSI_RESET);
             let title = trim(safeInput("নোটের শিরোনাম: "));
@@ -180,7 +200,7 @@ let main = fn() {
                 engine = Notes.addNote(engine, title, content, category, cleanTags, "indigo", "medium", false, false, []);
                 puts(Theme.ANSI_FG_GREEN + "✅ নতুন নোট সফলভাবে যুক্ত হয়েছে!\n" + Theme.ANSI_RESET);
             }
-        } else if (cmd == "e" || cmd == "edit") {
+        } else if (cmd == "e" || cmd == "edit" || cmd == "এডিট") {
             // নোট এডিট করা
             if (activeNote != null) {
                 puts(Theme.ANSI_BOLD + "\n--- ✏️ নোট পরিবর্তন (Edit Note) ---" + Theme.ANSI_RESET);
@@ -195,7 +215,7 @@ let main = fn() {
                 engine = Notes.updateNote(engine, activeNote["id"], newTitle, newContent, activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], activeNote["checklist"]);
                 puts(Theme.ANSI_FG_GREEN + "✅ নোট সফলভাবে আপডেট হয়েছে!\n" + Theme.ANSI_RESET);
             }
-        } else if (cmd == "d" || cmd == "delete") {
+        } else if (cmd == "d" || cmd == "delete" || cmd == "ডিলিট" || cmd == "মুছুন") {
             // ডিলিট করা
             if (activeNote != null) {
                 engine = Notes.deleteNote(engine, activeNote["id"]);
@@ -218,8 +238,9 @@ let main = fn() {
             if (activeNote != null && len(activeNote["checklist"]) > 0) {
                 let numStr = trim(safeInput("কোন টাস্ক নম্বর টগল করবেন? (1-" + str(len(activeNote["checklist"])) + "): "));
                 if (numStr != "") {
-                    let idx = int(numStr) - 1;
-                    if (idx >= 0 && idx < len(activeNote["checklist"])) {
+                    let parsed = safeParseInt(numStr);
+                    let idx = parsed - 1;
+                    if (parsed > 0 && idx >= 0 && idx < len(activeNote["checklist"])) {
                         let targetItem = activeNote["checklist"][idx];
                         let updatedChecks = Checklist.toggleCheckItem(activeNote["checklist"], targetItem["id"]);
                         engine = Notes.updateNote(engine, activeNote["id"], activeNote["title"], activeNote["content"], activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], updatedChecks);
@@ -275,9 +296,11 @@ let main = fn() {
             } else {
                 puts(Theme.ANSI_FG_RED + "❌ ব্যাকআপ সংরক্ষণ ব্যর্থ হয়েছে।\n" + Theme.ANSI_RESET);
             }
+        } else if (cmd == "") {
+            // খালি এন্টার চাপলে স্ক্রিন রিফ্রেশ হবে
         } else {
             // সংখ্যা ইনপুট হলে সেই নম্বরের নোট সিলেক্ট করা
-            let idx = int(cmd);
+            let idx = safeParseInt(cmd);
             if (idx >= 1 && idx <= len(filtered)) {
                 engine["activeNoteId"] = filtered[idx - 1]["id"];
                 puts(Theme.ANSI_FG_GREEN + "নোট নির্বাচিত: " + filtered[idx - 1]["title"] + "\n" + Theme.ANSI_RESET);

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📝 নীলাং উইন্ডোজ নোটস অ্যাপ (Nilang Windows Notes)</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0a0a0f; color: #ffffff; margin: 0; padding: 24px; }
+  .alap-card { background: #161622; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.1); }
+  .alap-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+  .alap-table th, .alap-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .alap-table th { background: rgba(255,255,255,0.05); color: #00ffcc; }
+  .alap-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #00d4ff; color: #fff; }
+  .alap-btn { background: #00d4ff; color: white; border: none; padding: 10px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+  .alap-input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px; border-radius: 6px; width: 100%; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<div data-alap-root style="max-width: 900px; margin: 0 auto;">
+  <h1 style="color:#00ffcc;">📝 নীলাং উইন্ডোজ নোটস অ্যাপ (Nilang Windows Notes)</h1>
+<nav style="display:flex; gap:20px; align-items:center; margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1);"><strong style="font-size:18px; color:#00ffcc;">NilNotes Win11</strong><a href="/" style="color:#ffffff; text-decoration:none;">নোটবুক</a><a href="#checklist" style="color:#ffffff; text-decoration:none;">চেকলিস্ট</a><a href="#stats" style="color:#ffffff; text-decoration:none;">অ্যানালিটিক্স</a></nav><h2>📊 নোটবুক ওভারভিউ — উইন্ডোজ নোটবুক প্রস্তুত (Ready)</h2><div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;"><div class="alap-card"><div style="color:#94a3b8; font-size:13px;">সক্রিয় নোট</div><div style="font-size:24px; font-weight:bold; margin:6px 0;">4</div><div style="color:#4ade80; font-size:12px;">মোট 4</div></div><div class="alap-card"><div style="color:#94a3b8; font-size:13px;">পিন্ড / জরুরি</div><div style="font-size:24px; font-weight:bold; margin:6px 0;">2</div><div style="color:#4ade80; font-size:12px;">⭐ 2 ফেভারিট</div></div><div class="alap-card"><div style="color:#94a3b8; font-size:13px;">মোট শব্দ</div><div style="font-size:24px; font-weight:bold; margin:6px 0;">117</div><div style="color:#4ade80; font-size:12px;">930 অক্ষর</div></div><div class="alap-card"><div style="color:#94a3b8; font-size:13px;">টাস্ক অগ্রগতি</div><div style="font-size:24px; font-weight:bold; margin:6px 0;">70%</div><div style="color:#4ade80; font-size:12px;">7/10 সম্পন্ন</div></div></div><button id="cat-all" class="alap-btn" data-alap-click="selectCategory" data-alap-payload="&#34;all&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#6366f1; color:#ffffff; border:none; font-weight:bold; cursor:pointer;">📑 সকল নোট</button><button id="cat-important" class="alap-btn" data-alap-click="selectCategory" data-alap-payload="&#34;important&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">📌 জরুরি</button><button id="cat-work" class="alap-btn" data-alap-click="selectCategory" data-alap-payload="&#34;work&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">💼 কাজ (Work)</button><button id="cat-personal" class="alap-btn" data-alap-click="selectCategory" data-alap-payload="&#34;personal&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">🏠 ব্যক্তিগত</button><button id="cat-ideas" class="alap-btn" data-alap-click="selectCategory" data-alap-payload="&#34;ideas&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">💡 আইডিয়া</button><button id="btn-new-note" class="alap-btn" data-alap-click="createQuickNote" data-alap-payload="&#34;&#34;" style="display:inline-block; margin:4px; padding:10px 18px; border-radius:10px; background:#0ea5e9; color:#ffffff; border:none; font-weight:bold; cursor:pointer;">➕ নতুন নোট তৈরি করুন</button><table class="alap-table"><thead><tr><th>#</th><th>শিরোনাম</th><th>ক্যাটাগরি</th><th>ট্যাগসমূহ</th><th>চেকলিস্ট</th></tr></thead><tbody><tr><td>1</td><td>▶ 📌 ⭐ স্বাগতম নীলাং নোটবুক-এ! (Nilang Notes Guide)</td><td>important</td><td>নীলাং, গাইড, নোটবুক, অনুরণ</td><td>4 টি টাস্ক</td></tr><tr><td>2</td><td>📌 দৈনিক কাজের পরিকল্পনা ও ডেডলাইন</td><td>todo</td><td>কাজ, প্ল্যানিং, টাস্ক</td><td>4 টি টাস্ক</td></tr><tr><td>3</td><td>⭐ অনুরণ ওএস: মাইক্রোকার্নেল আর্কিটেকচার আইডিয়া</td><td>ideas</td><td>আর্কিটেকচার, ওএস, রিসার্চ</td><td>2 টি টাস্ক</td></tr><tr><td>4</td><td>অনুপ্রেরণাদায়ক উক্তি ও জ্ঞান</td><td>personal</td><td>উক্তি, বই, শিক্ষা</td><td>0 টি টাস্ক</td></tr></tbody></table><button id="select-note-1" class="alap-btn" data-alap-click="selectNote" data-alap-payload="&#34;note-1&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#6366f1; color:#ffffff; border:none; font-weight:bold; cursor:pointer;">📖 পড়ুন: স্বাগতম নীলাং নোটবুক-এ! (Nilang Notes Guide)</button><button id="select-note-2" class="alap-btn" data-alap-click="selectNote" data-alap-payload="&#34;note-2&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">📖 পড়ুন: দৈনিক কাজের পরিকল্পনা ও ডেডলাইন</button><button id="select-note-3" class="alap-btn" data-alap-click="selectNote" data-alap-payload="&#34;note-3&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">📖 পড়ুন: অনুরণ ওএস: মাইক্রোকার্নেল আর্কিটেকচার আইডিয়া</button><button id="select-note-4" class="alap-btn" data-alap-click="selectNote" data-alap-payload="&#34;note-4&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">📖 পড়ুন: অনুপ্রেরণাদায়ক উক্তি ও জ্ঞান</button><div class="alap-card"><h3>📝 স্বাগতম নীলাং নোটবুক-এ! (Nilang Notes Guide)</h3><p>ক্যাটাগরি: important | রঙ: indigo | ট্যাগ: #নীলাং #গাইড #নোটবুক #অনুরণ
+────────────────────────────────────────
+নীলাং ভাষায় তৈরি আধুনিক, দ্রুতগতির এবং সুন্দর নোট অ্যাপ্লিকেশন।
+
+প্রধান সুবিধাসমূহ:
+- সম্পূর্ণ বাংলায় ও ইংরেজিতে নোট সংরক্ষণ
+- লাইভ সার্চ ও ক্যাটাগরি ফিল্টারিং
+- প্রতিটি নোটে কালার ব্যাজ ও প্রায়োরিটি
+- সম্পূর্ণ ক্রস-প্ল্যাটফর্ম (Windows, Linux, Onuron, QEMU)
+
+✅ চেকলিস্ট:
+  [✓] ক্যাটাগরি ও ট্যাগ দিয়ে নোট সাজানো
+  [✓] ইন্টারেক্টিভ চেকলিস্ট ও টাস্ক তৈরি
+  [✓] QEMU এমুলেটরে ভার্চুয়াল ওএস টেস্ট করা
+  [ ] অটো-সেভ ও ডেটা রিকভারি যাচাই করা
+</p></div><button id="btn-pin" class="alap-btn" data-alap-click="togglePinActive" data-alap-payload="&#34;&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">📌 আনপিন করুন</button><button id="btn-fav" class="alap-btn" data-alap-click="toggleFavActive" data-alap-payload="&#34;&#34;" style="display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;">⭐ ফেভারিট সরান</button><button id="btn-delete" class="alap-btn" data-alap-click="deleteActive" data-alap-payload="&#34;&#34;" style="display:inline-block; margin:4px; padding:10px 18px; border-radius:10px; background:#ef4444; color:#ffffff; border:none; font-weight:bold; cursor:pointer;">🗑️ ট্র্যাশে পাঠান</button><footer style="margin-top:40px; color:#64748b; font-size:13px; text-align:center;">সম্পূর্ণ নীলাং (.nil) ও আলাপ (Alap) ফ্রেমওয়ার্কে তৈরি • Windows / Linux / Onuron OS</footer>
+<script id="__NILANG_STATE__" type="application/json">{"engine":{"activeCategory":"all","activeNoteId":"note-1","filePath":"notes.json","notes":[{"category":"important","checklist":[{"completed":true,"id":"chk-1","text":"ক্যাটাগরি ও ট্যাগ দিয়ে নোট সাজানো"},{"completed":true,"id":"chk-2","text":"ইন্টারেক্টিভ চেকলিস্ট ও টাস্ক তৈরি"},{"completed":true,"id":"chk-3","text":"QEMU এমুলেটরে ভার্চুয়াল ওএস টেস্ট করা"},{"completed":false,"id":"chk-4","text":"অটো-সেভ ও ডেটা রিকভারি যাচাই করা"}],"color":"indigo","content":"নীলাং ভাষায় তৈরি আধুনিক, দ্রুতগতির এবং সুন্দর নোট অ্যাপ্লিকেশন।\n\nপ্রধান সুবিধাসমূহ:\n- সম্পূর্ণ বাংলায় ও ইংরেজিতে নোট সংরক্ষণ\n- লাইভ সার্চ ও ক্যাটাগরি ফিল্টারিং\n- প্রতিটি নোটে কালার ব্যাজ ও প্রায়োরিটি\n- সম্পূর্ণ ক্রস-প্ল্যাটফর্ম (Windows, Linux, Onuron, QEMU)","createdAt":1792228852,"id":"note-1","isArchived":false,"isFavorite":true,"isPinned":true,"isTrashed":false,"priority":"high","tags":["নীলাং","গাইড","নোটবুক","অনুরণ"],"title":"স্বাগতম নীলাং নোটবুক-এ! (Nilang Notes Guide)","updatedAt":1792228852},{"category":"todo","checklist":[{"completed":true,"id":"chk-21","text":"নীলাং কোডবেজ রিফ্যাক্টরিং"},{"completed":true,"id":"chk-22","text":"আলাপ UI ডিক্লারেটিভ কম্পোনেন্ট তৈরি"},{"completed":true,"id":"chk-23","text":"QEMU x86_64 কার্নেল বুট টেস্ট"},{"completed":false,"id":"chk-24","text":"রিসার্চ পেপার ড্রাফট রিভিশন"}],"color":"emerald","content":"আজকের সর্বোচ্চ অগ্রাধিকারের কাজগুলো সম্পন্ন করতে হবে। সন্ধ্যে ৬টার মধ্যে বিল্ড টেস্ট সমাপ্ত করা দরকার।","createdAt":1792228852,"id":"note-2","isArchived":false,"isFavorite":false,"isPinned":true,"isTrashed":false,"priority":"high","tags":["কাজ","প্ল্যানিং","টাস্ক"],"title":"দৈনিক কাজের পরিকল্পনা ও ডেডলাইন","updatedAt":1792228852},{"category":"ideas","checklist":[{"completed":true,"id":"chk-31","text":"মাইক্রো-কার্নেল ড্রাইভার ডিজাইন"},{"completed":false,"id":"chk-32","text":"জিরো-কপি IPC মেমোরি চ্যানেল"}],"color":"cyan","content":"অনুরণ অপারেটিং সিস্টেমে আল্ট্রা-লাইটওয়েট প্রসেস আইসোলেশন ও সফটবাস (SoftBus) আর্কিটেকচার বাস্তবায়ন করা।\n\nলক্ষ্য:\n১. দ্রুততম রেসপন্স টাইম (\u003c 2ms)\n২. সুরক্ষিত মেমোরি স্যান্ডবক্সিং\n৩. নীলাং বাইটকোড ডিরেক্ট এক্সিকিউশন","createdAt":1792228852,"id":"note-3","isArchived":false,"isFavorite":true,"isPinned":false,"isTrashed":false,"priority":"medium","tags":["আর্কিটেকচার","ওএস","রিসার্চ"],"title":"অনুরণ ওএস: মাইক্রোকার্নেল আর্কিটেকচার আইডিয়া","updatedAt":1792228852},{"category":"personal","checklist":[],"color":"violet","content":"\"জ্ঞানের চেয়ে কল্পনাশক্তি অধিক গুরুত্বপূর্ণ, কারণ জ্ঞান সীমাবদ্ধ, কিন্তু কল্পনা জগতকে আলিঙ্গন করে।\" — অ্যালবার্ট আইনস্টাইন\n\nবইয়ের তালিকা:\n১. Clean Code (Robert C. Martin)\n২. Designing Data-Intensive Applications","createdAt":1792228852,"id":"note-4","isArchived":false,"isFavorite":false,"isPinned":false,"isTrashed":false,"priority":"low","tags":["উক্তি","বই","শিক্ষা"],"title":"অনুপ্রেরণাদায়ক উক্তি ও জ্ঞান","updatedAt":1792228852}],"searchQuery":"","selectedTag":"","theme":"dark"},"statusMsg":"উইন্ডোজ নোটবুক প্রস্তুত (Ready)"}</script>
+<script>
+  window.__NILANG_INITIAL_STATE__ = JSON.parse(document.getElementById('__NILANG_STATE__').textContent);
+</script>
+</div><script src="/alap-runtime.js"></script><script>
+/**
+ * Alap UI Unified Browser Runtime v2.0 (ADR-0005: single keyed-patch runtime)
+ *
+ * This is the ONLY client runtime served by nil dev (see /alap-runtime.js).
+ * It combines:
+ *  - keyed incremental DOM patching (applyPatches: REPLACE/TEXT/PROPS/
+ *    INSERT_CHILD/REMOVE_CHILD/MOVE), mirroring Go pkg/alap/ui Diff,
+ *  - reactive state store with data-alap-text / data-alap-bind hydration,
+ *  - event delegation that POSTs to /__alap/event and applies PATCH responses.
+ */
+
+(function (window, document) {
+  'use strict';
+
+  console.log('[Alap UI] Initializing unified keyed-patch runtime v2.0...');
+
+  var initialState = window.__NILANG_INITIAL_STATE__ || {};
+  var listeners = {};
+
+  var state = new Proxy(Object.assign({}, initialState), {
+    set: function (target, prop, value) {
+      target[prop] = value;
+      notifyPropertyChange(prop, value);
+      return true;
+    }
+  });
+
+  function notifyPropertyChange(prop, value) {
+    document.querySelectorAll('[data-alap-text="' + prop + '"]').forEach(function (el) {
+      el.textContent = value;
+    });
+    document.querySelectorAll('[data-alap-bind="' + prop + '"]').forEach(function (el) {
+      if (el.value !== undefined && el.value !== String(value)) el.value = value;
+    });
+    if (listeners[prop]) listeners[prop].forEach(function (fn) { fn(value); });
+  }
+
+  function on(eventName, callback) {
+    if (!listeners[eventName]) listeners[eventName] = [];
+    listeners[eventName].push(callback);
+  }
+
+  function emit(eventName, payload) {
+    if (listeners[eventName]) listeners[eventName].forEach(function (fn) { fn(payload); });
+  }
+
+  function syncState(nextState) {
+    Object.keys(state).forEach(function (key) {
+      if (!(key in nextState)) delete state[key];
+    });
+    Object.assign(state, nextState);
+  }
+
+  function resolveNodeByPath(root, path) {
+    var current = root;
+    for (var i = 0; i < path.length; i++) {
+      if (!current || !current.childNodes || current.childNodes.length <= path[i]) return null;
+      current = current.childNodes[path[i]];
+    }
+    return current;
+  }
+
+  function createDOMNode(vnode) {
+    if (!vnode) return document.createTextNode('');
+    if (vnode.type === 'TEXT') return document.createTextNode(vnode.text || '');
+    var el = document.createElement(vnode.tag || 'div');
+    if (vnode.id) el.id = vnode.id;
+    if (vnode.key) el.setAttribute('data-key', vnode.key);
+    if (vnode.attrs) {
+      Object.entries(vnode.attrs).forEach(function (kv) {
+        var k = kv[0], v = kv[1];
+        if (k === 'class') el.className = v;
+        else if (k === 'style') el.style.cssText = v;
+        else el.setAttribute(k, v);
+      });
+    }
+    if (vnode.events) {
+      Object.entries(vnode.events).forEach(function (kv) {
+        el.setAttribute('data-alap-' + kv[0], kv[1]);
+      });
+    }
+    if (vnode.children) {
+      for (var i = 0; i < vnode.children.length; i++) el.appendChild(createDOMNode(vnode.children[i]));
+    }
+    return el;
+  }
+
+  function applyPatches(rootElement, patches) {
+    if (!rootElement || !Array.isArray(patches)) return;
+    for (var i = 0; i < patches.length; i++) {
+      var patch = patches[i];
+      var target = null;
+      if (patch.node_id) target = document.getElementById(patch.node_id);
+      if (!target && patch.path) target = resolveNodeByPath(rootElement, patch.path);
+      if (!target) target = rootElement;
+      switch (patch.type) {
+        case 'REPLACE': {
+          var newEl = createDOMNode(patch.vnode);
+          if (target.parentNode) target.parentNode.replaceChild(newEl, target);
+          break;
+        }
+        case 'TEXT':
+          target.textContent = patch.text || '';
+          break;
+        case 'PROPS':
+          if (patch.props && target.nodeType === 1) {
+            Object.entries(patch.props).forEach(function (kv) {
+              if (kv[1] === '') target.removeAttribute(kv[0]);
+              else if (kv[0] === 'class') target.className = kv[1];
+              else if (kv[0] === 'style') target.style.cssText = kv[1];
+              else target.setAttribute(kv[0], kv[1]);
+            });
+          }
+          break;
+        case 'INSERT_CHILD':
+          target.insertBefore(
+            createDOMNode(patch.vnode),
+            target.childNodes[patch.index] || null
+          );
+          break;
+        case 'REMOVE_CHILD':
+          if (target.childNodes && target.childNodes.length > patch.index) {
+            target.removeChild(target.childNodes[patch.index]);
+          }
+          break;
+        case 'MOVE': {
+          if (target.childNodes && target.childNodes.length > patch.from) {
+            var moved = target.childNodes[patch.from];
+            target.removeChild(moved);
+            target.insertBefore(moved, target.childNodes[patch.to] || null);
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  function applyPatchResponse(payload) {
+    // Server may answer an event with {patches, state} (preferred, ADR-0005)
+    // or with a full HTML document (legacy fallback).
+    if (payload && Array.isArray(payload.patches)) {
+      var root = document.querySelector('[data-alap-root]');
+      applyPatches(root, payload.patches);
+      if (payload.state) syncState(payload.state);
+      hydrateDOM();
+      return true;
+    }
+    return false;
+  }
+
+  function dispatchAction(action, payload) {
+    var request = { event: action };
+    if (payload !== undefined) request.payload = payload;
+    return fetch('/__alap/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json, text/html' },
+      body: JSON.stringify(request)
+    }).then(function (response) {
+      if (!response.ok) throw new Error('NilLang event ' + action + ' failed: ' + response.status);
+      var contentType = response.headers.get('Content-Type') || '';
+      if (contentType.indexOf('application/json') !== -1) {
+        return response.json().then(function (data) {
+          if (!applyPatchResponse(data)) throw new Error('Unknown patch response');
+          emit('action:' + action, { state: state });
+        });
+      }
+      // Legacy HTML fallback: full-root replace (deprecated path).
+      return response.text().then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        var currentRoot = document.querySelector('[data-alap-root]');
+        var nextRoot = doc.querySelector('[data-alap-root]');
+        if (!currentRoot || !nextRoot) throw new Error('Event response missing Alap root');
+        currentRoot.replaceWith(document.importNode(nextRoot, true));
+        var stateElement = doc.getElementById('__NILANG_STATE__');
+        if (stateElement) syncState(JSON.parse(stateElement.textContent));
+        hydrateDOM();
+        emit('action:' + action, { state: state });
+      });
+    });
+  }
+
+  function hydrateDOM() {
+    document.querySelectorAll('[data-alap-click]').forEach(function (el) {
+      if (el.__alapHydrated) return;
+      el.__alapHydrated = true;
+      var action = el.getAttribute('data-alap-click');
+      var payloadData = el.getAttribute('data-alap-payload');
+      el.addEventListener('click', function () {
+        el.disabled = true;
+        var payload = payloadData === null ? undefined : JSON.parse(payloadData);
+        dispatchAction(action, payload).catch(function (err) {
+          el.disabled = false;
+          console.error(err);
+        });
+      });
+    });
+    document.querySelectorAll('[data-alap-bind]').forEach(function (el) {
+      if (el.__alapHydrated) return;
+      el.__alapHydrated = true;
+      var prop = el.getAttribute('data-alap-bind');
+      if (state[prop] !== undefined) el.value = state[prop];
+      el.addEventListener('input', function (e) { state[prop] = e.target.value; });
+    });
+  }
+
+  window.AlapRuntime = {
+    version: '2.0.0',
+    state: state,
+    on: on,
+    emit: emit,
+    syncState: syncState,
+    resolveNodeByPath: resolveNodeByPath,
+    createDOMNode: createDOMNode,
+    applyPatches: applyPatches,
+    dispatch: dispatchAction,
+    hydrate: hydrateDOM
+  };
+  window.__ALAP__ = window.AlapRuntime;
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hydrateDOM);
+  else hydrateDOM();
+})(window, document);
+</script></body></html>
