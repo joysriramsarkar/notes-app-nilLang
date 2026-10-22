@@ -1,18 +1,12 @@
-// src/domain/theme.nil
-// নীলাং নোট অ্যাপ — থিম ও কালার ইঞ্জিন
-
 let THEME_DARK = "dark";
 let THEME_CYBER = "cyber";
 let THEME_EMERALD = "emerald";
 let THEME_BANGLA = "bangla";
 let THEME_LIGHT = "light";
-
-// ANSI কালার কোড
 let ANSI_RESET = "\x1b[0m";
 let ANSI_BOLD = "\x1b[1m";
 let ANSI_DIM = "\x1b[2m";
 let ANSI_UNDERLINE = "\x1b[4m";
-
 let ANSI_FG_BLACK = "\x1b[30m";
 let ANSI_FG_RED = "\x1b[31m";
 let ANSI_FG_GREEN = "\x1b[32m";
@@ -21,18 +15,14 @@ let ANSI_FG_BLUE = "\x1b[34m";
 let ANSI_FG_MAGENTA = "\x1b[35m";
 let ANSI_FG_CYAN = "\x1b[36m";
 let ANSI_FG_WHITE = "\x1b[37m";
-
 let ANSI_FG_BRIGHT_BLUE = "\x1b[94m";
 let ANSI_FG_BRIGHT_CYAN = "\x1b[96m";
 let ANSI_FG_BRIGHT_GREEN = "\x1b[92m";
 let ANSI_FG_BRIGHT_YELLOW = "\x1b[93m";
 let ANSI_FG_BRIGHT_MAGENTA = "\x1b[95m";
-
 let ANSI_BG_DARK_BLUE = "\x1b[44m";
 let ANSI_BG_DARK_CYAN = "\x1b[46m";
 let ANSI_BG_DARK_GRAY = "\x1b[100m";
-
-// থিমের তালিকা
 let getThemeList = fn() {
     let list = [];
     list = append(list, {"id": "dark", "name": "ডিপ নাইট / Deep Night", "primary": "#6366F1", "bg": "#0F172A", "surface": "#1E293B", "text": "#F8FAFC"});
@@ -42,8 +32,6 @@ let getThemeList = fn() {
     list = append(list, {"id": "light", "name": "উজ্জ্বল ক্লিন / Pure Clean", "primary": "#2563EB", "bg": "#F8FAFC", "surface": "#FFFFFF", "text": "#0F172A"});
     return list;
 };
-
-// টার্মিনাল হেডার ফরম্যাট করা
 let formatTerminalHeader = fn(themeName) {
     let border = "═";
     let b = "";
@@ -52,8 +40,5 @@ let formatTerminalHeader = fn(themeName) {
         b = b + border;
         i = i + 1;
     }
-    return ANSI_FG_BRIGHT_CYAN + ANSI_BOLD + "╔" + b + "╗\n" +
-           "║        📝 নীলাং নোটবুক (NILANG NOTES v1.0) • QEMU READY        ║\n" +
-           "║           মডার্ন রিচ টেক্সট, চেকলিস্ট ও ডেটাবেস সমৃদ্ধ নোট           ║\n" +
-           "╚" + b + "╝" + ANSI_RESET;
+    return ANSI_FG_BRIGHT_CYAN + ANSI_BOLD + "╔" + b + "╗\n" + "║        📝 নীলাং নোটবুক (NILANG NOTES v1.0) • QEMU READY        ║\n" + "║           মডার্ন রিচ টেক্সট, চেকলিস্ট ও ডেটাবেস সমৃদ্ধ নোট           ║\n" + "╚" + b + "╝" + ANSI_RESET;
 };

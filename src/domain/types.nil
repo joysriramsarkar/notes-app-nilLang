@@ -1,6 +1,3 @@
-// src/domain/types.nil
-// নীলাং নোট অ্যাপ — টাইপ ও কনস্ট্যান্ট সংজ্ঞায়ন
-
 let CATEGORY_ALL = "all";
 let CATEGORY_IMPORTANT = "important";
 let CATEGORY_WORK = "work";
@@ -10,8 +7,6 @@ let CATEGORY_STUDY = "study";
 let CATEGORY_TODO = "todo";
 let CATEGORY_ARCHIVE = "archive";
 let CATEGORY_TRASH = "trash";
-
-// ক্যাটাগরি তালিকা ও আইকন
 let getCategoryList = fn() {
     let list = [];
     list = append(list, {"id": "all", "name": "সকল নোট", "nameEn": "All Notes", "icon": "📑", "color": "#4A90E2"});
@@ -25,8 +20,6 @@ let getCategoryList = fn() {
     list = append(list, {"id": "trash", "name": "ট্র্যাশ / মুছে ফেলা", "nameEn": "Trash", "icon": "🗑️", "color": "#FF3B30"});
     return list;
 };
-
-// রঙের তালিকা
 let getColorPalette = fn() {
     let colors = [];
     colors = append(colors, {"id": "indigo", "name": "নীল / Indigo", "hex": "#4F46E5", "bg": "#1E1B4B"});
@@ -37,24 +30,7 @@ let getColorPalette = fn() {
     colors = append(colors, {"id": "cyan", "name": "আকাশি / Cyan", "hex": "#06B6D4", "bg": "#164E63"});
     return colors;
 };
-
-// একটি খালি নোট অবজেক্ট তৈরি
 let createNote = fn(id, title, content, category, tags, color, priority, isPinned, isFavorite, checklist) {
     let now = time();
-    return {
-        "id": id,
-        "title": title,
-        "content": content,
-        "category": category,
-        "tags": tags,
-        "color": color,
-        "priority": priority,
-        "isPinned": isPinned,
-        "isFavorite": isFavorite,
-        "isArchived": false,
-        "isTrashed": false,
-        "checklist": checklist,
-        "createdAt": now,
-        "updatedAt": now
-    };
+    return {"id": id, "title": title, "content": content, "category": category, "tags": tags, "color": color, "priority": priority, "isPinned": isPinned, "isFavorite": isFavorite, "isArchived": false, "isTrashed": false, "checklist": checklist, "createdAt": now, "updatedAt": now};
 };

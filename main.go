@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -63,7 +64,18 @@ func main() {
 		go openBrowser(fmt.Sprintf("http://localhost:%d/device.html", port))
 	}
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), mux); err != nil {
+	host := os.Getenv("HOST")
+	if host == "" {
+		host = "127.0.0.1"
+	}
+	srv := &http.Server{
+		Addr:         fmt.Sprintf("%s:%d", host, port),
+		Handler:      mux,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 30 * time.Second,
+		IdleTimeout:  60 * time.Second,
+	}
+	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
 }
@@ -109,6 +121,10 @@ func handleSingleNote(w http.ResponseWriter, r *http.Request) {
 
 	// Sub-actions: /api/notes/:id/pin, /api/notes/:id/favorite, /api/notes/:id/toggle-checklist
 	if len(parts) > 1 {
+		if r.Method != http.MethodPost && r.Method != http.MethodPut && r.Method != http.MethodPatch {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
 		action := parts[1]
 		note, found := store.Get(id)
 		if !found {
@@ -323,11 +339,26 @@ func handleEmulatorPackages(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pkgs)
 }
 
+func isAllowedLocalOrigin(r *http.Request) bool {
+	origin := r.Header.Get("Origin")
+	if origin == "" {
+		return true
+	}
+	return strings.HasPrefix(origin, "http://localhost:") ||
+		strings.HasPrefix(origin, "http://127.0.0.1:") ||
+		origin == "http://localhost" ||
+		origin == "http://127.0.0.1"
+}
+
 func handleEmulatorTerminal(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if !isAllowedLocalOrigin(r) {
+		http.Error(w, "Forbidden cross-origin request", http.StatusForbidden)
 		return
 	}
 
@@ -341,12 +372,15 @@ func handleEmulatorTerminal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nilBin := `..\nilLang\bin\nil.exe`
+	nilBin := os.Getenv("NIL_BIN")
+	if nilBin == "" {
+		nilBin = `..\nilLang\bin\nil.exe`
+	}
 	if _, err := os.Stat(nilBin); os.IsNotExist(err) {
 		nilBin = "nil"
 	}
 
-	// 1. Command execution (e.g. "nil --version", "nil run ...")
+	// 1. Command execution (restricted to nil toolchain commands)
 	if req.Command != "" {
 		parts := strings.Fields(req.Command)
 		if len(parts) == 0 {
@@ -354,18 +388,25 @@ func handleEmulatorTerminal(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		bin := parts[0]
-		args := parts[1:]
-		if bin == "nil" {
-			bin = nilBin
+		if parts[0] != "nil" {
+			http.Error(w, "Only 'nil' toolchain commands are permitted in the emulator terminal", http.StatusForbidden)
+			return
 		}
+		args := parts[1:]
 
-		cmd := exec.Command(bin, args...)
+		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+		defer cancel()
+
+		cmd := exec.CommandContext(ctx, nilBin, args...)
 		out, err := cmd.CombinedOutput()
+		exitCode := -1
+		if cmd.ProcessState != nil {
+			exitCode = cmd.ProcessState.ExitCode()
+		}
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success":  err == nil,
 			"output":   string(out),
-			"exitCode": cmd.ProcessState.ExitCode(),
+			"exitCode": exitCode,
 		})
 		return
 	}
@@ -379,7 +420,10 @@ func handleEmulatorTerminal(w http.ResponseWriter, r *http.Request) {
 		}
 		defer os.Remove(tmpFile)
 
-		cmd := exec.Command(nilBin, "run", tmpFile)
+		ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+		defer cancel()
+
+		cmd := exec.CommandContext(ctx, nilBin, "run", tmpFile)
 		out, err := cmd.CombinedOutput()
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"success": err == nil,
@@ -460,12 +504,36 @@ func handleMusicTracks(w http.ResponseWriter, r *http.Request) {
 func handleFilesBrowse(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	rootDir, err := os.Getwd()
+	if err != nil {
+		http.Error(w, "failed to resolve workspace root", http.StatusInternalServerError)
+		return
+	}
+	absRoot, err := filepath.Abs(rootDir)
+	if err != nil {
+		http.Error(w, "failed to resolve workspace root", http.StatusInternalServerError)
+		return
+	}
+
 	reqPath := r.URL.Query().Get("path")
 	if reqPath == "" || reqPath == "/" {
 		reqPath = "."
 	}
 
-	entries, err := os.ReadDir(reqPath)
+	var candidate string
+	if filepath.IsAbs(reqPath) {
+		candidate = filepath.Clean(reqPath)
+	} else {
+		candidate = filepath.Clean(filepath.Join(absRoot, reqPath))
+	}
+
+	rel, relErr := filepath.Rel(absRoot, candidate)
+	if relErr != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		http.Error(w, "path outside workspace", http.StatusForbidden)
+		return
+	}
+
+	entries, err := os.ReadDir(candidate)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -482,12 +550,12 @@ func handleFilesBrowse(w http.ResponseWriter, r *http.Request) {
 			"name":  e.Name(),
 			"isDir": e.IsDir(),
 			"size":  size,
-			"path":  filepath.Join(reqPath, e.Name()),
+			"path":  filepath.Join(rel, e.Name()),
 		})
 	}
 
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"currentPath": reqPath,
+		"currentPath": rel,
 		"entries":     fileList,
 	})
 }
@@ -496,7 +564,10 @@ func handleFilesBrowse(w http.ResponseWriter, r *http.Request) {
 func handleLaunchQEMU(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	qemuPath := `C:\Program Files\qemu\qemu-system-x86_64.exe`
+	qemuPath := os.Getenv("QEMU_PATH")
+	if qemuPath == "" {
+		qemuPath = `C:\Program Files\qemu\qemu-system-x86_64.exe`
+	}
 	bootImg := filepath.Join("qemu", "notes-os.img")
 
 	if _, err := os.Stat(qemuPath); os.IsNotExist(err) {
@@ -526,7 +597,10 @@ func handleLaunchQEMU(w http.ResponseWriter, r *http.Request) {
 func handleRunNilang(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	nilBin := `..\nilLang\bin\nil.exe`
+	nilBin := os.Getenv("NIL_BIN")
+	if nilBin == "" {
+		nilBin = `..\nilLang\bin\nil.exe`
+	}
 	if _, err := os.Stat(nilBin); os.IsNotExist(err) {
 		nilBin = "nil"
 	}
@@ -559,4 +633,3 @@ func openBrowser(url string) {
 	}
 	exec.Command(cmd, args...).Start()
 }
-

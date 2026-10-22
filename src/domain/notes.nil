@@ -1,31 +1,14 @@
-// src/domain/notes.nil
-// নীলাং নোট অ্যাপ — কোর নোট ইঞ্জিন (Notes Engine)
-
 import "./types.nil" as Types;
 import "./checklist.nil" as Checklist;
 import "./markdown.nil" as Markdown;
 import "./storage.nil" as Storage;
-
-// নতুন নোট ইঞ্জিন ইনস্ট্যান্স তৈরি
 let createNotesEngine = fn() {
     let seed = Storage.getSeedNotes();
-    return {
-        "notes": seed,
-        "activeNoteId": "note-1",
-        "activeCategory": "all",
-        "searchQuery": "",
-        "selectedTag": "",
-        "theme": "dark",
-        "filePath": "notes.json"
-    };
+    return {"notes": seed, "activeNoteId": "note-1", "activeCategory": "all", "searchQuery": "", "selectedTag": "", "theme": "dark", "filePath": "notes.json"};
 };
-
-// নোট সংখ্যা
 let getCount = fn(engine) {
     return len(engine["notes"]);
 };
-
-// নির্দিষ্ট আইডি দিয়ে নোট খোঁজা
 let getNoteById = fn(engine, id) {
     let notes = engine["notes"];
     let i = 0;
@@ -37,8 +20,6 @@ let getNoteById = fn(engine, id) {
     }
     return null;
 };
-
-// নতুন নোট যোগ করা
 let addNote = fn(engine, title, content, category, tags, color, priority, isPinned, isFavorite, checklist) {
     let newId = "note-" + str(len(engine["notes"]) + 1) + "-" + str(time());
     let note = Types.createNote(newId, title, content, category, tags, color, priority, isPinned, isFavorite, checklist);
@@ -48,33 +29,15 @@ let addNote = fn(engine, title, content, category, tags, color, priority, isPinn
     Storage.saveNotesToFile(updatedNotes, engine["filePath"]);
     return engine;
 };
-
-// বিদ্যমান নোট আপডেট করা
 let updateNote = fn(engine, id, title, content, category, tags, color, priority, isPinned, isFavorite, checklist) {
     let notes = engine["notes"];
     let updatedList = [];
     let i = 0;
     let found = false;
-
     while (i < len(notes)) {
         let n = notes[i];
         if (n["id"] == id) {
-            let updated = {
-                "id": n["id"],
-                "title": title,
-                "content": content,
-                "category": category,
-                "tags": tags,
-                "color": color,
-                "priority": priority,
-                "isPinned": isPinned,
-                "isFavorite": isFavorite,
-                "isArchived": n["isArchived"],
-                "isTrashed": n["isTrashed"],
-                "checklist": checklist,
-                "createdAt": n["createdAt"],
-                "updatedAt": time()
-            };
+            let updated = {"id": n["id"], "title": title, "content": content, "category": category, "tags": tags, "color": color, "priority": priority, "isPinned": isPinned, "isFavorite": isFavorite, "isArchived": n["isArchived"], "isTrashed": n["isTrashed"], "checklist": checklist, "createdAt": n["createdAt"], "updatedAt": time()};
             updatedList = append(updatedList, updated);
             found = true;
         } else {
@@ -82,43 +45,22 @@ let updateNote = fn(engine, id, title, content, category, tags, color, priority,
         }
         i = i + 1;
     }
-
     if (found) {
         engine["notes"] = updatedList;
         Storage.saveNotesToFile(updatedList, engine["filePath"]);
     }
     return engine;
 };
-
-// নোট ডিলিট করা (মুছে ফেলা বা ট্র্যাশে পাঠানো)
 let deleteNote = fn(engine, id) {
     let notes = engine["notes"];
     let updatedList = [];
     let i = 0;
-
     while (i < len(notes)) {
         let n = notes[i];
         if (n["id"] == id) {
             if (n["isTrashed"]) {
-                // স্থায়ীভাবে মুছে ফেলা (Permanent Delete)
             } else {
-                // সফট ডিলিট: ট্র্যাশে পাঠানো
-                let trashed = {
-                    "id": n["id"],
-                    "title": n["title"],
-                    "content": n["content"],
-                    "category": n["category"],
-                    "tags": n["tags"],
-                    "color": n["color"],
-                    "priority": n["priority"],
-                    "isPinned": false,
-                    "isFavorite": n["isFavorite"],
-                    "isArchived": false,
-                    "isTrashed": true,
-                    "checklist": n["checklist"],
-                    "createdAt": n["createdAt"],
-                    "updatedAt": time()
-                };
+                let trashed = {"id": n["id"], "title": n["title"], "content": n["content"], "category": n["category"], "tags": n["tags"], "color": n["color"], "priority": n["priority"], "isPinned": false, "isFavorite": n["isFavorite"], "isArchived": false, "isTrashed": true, "checklist": n["checklist"], "createdAt": n["createdAt"], "updatedAt": time()};
                 updatedList = append(updatedList, trashed);
             }
         } else {
@@ -126,7 +68,6 @@ let deleteNote = fn(engine, id) {
         }
         i = i + 1;
     }
-
     engine["notes"] = updatedList;
     if (len(updatedList) > 0) {
         engine["activeNoteId"] = updatedList[0]["id"];
@@ -136,111 +77,78 @@ let deleteNote = fn(engine, id) {
     Storage.saveNotesToFile(updatedList, engine["filePath"]);
     return engine;
 };
-
-// পিন টগল করা
 let togglePin = fn(engine, id) {
     let notes = engine["notes"];
     let updatedList = [];
     let i = 0;
-
     while (i < len(notes)) {
         let n = notes[i];
         if (n["id"] == id) {
-            let updated = {
-                "id": n["id"],
-                "title": n["title"],
-                "content": n["content"],
-                "category": n["category"],
-                "tags": n["tags"],
-                "color": n["color"],
-                "priority": n["priority"],
-                "isPinned": !n["isPinned"],
-                "isFavorite": n["isFavorite"],
-                "isArchived": n["isArchived"],
-                "isTrashed": n["isTrashed"],
-                "checklist": n["checklist"],
-                "createdAt": n["createdAt"],
-                "updatedAt": time()
-            };
+            let updated = {"id": n["id"], "title": n["title"], "content": n["content"], "category": n["category"], "tags": n["tags"], "color": n["color"], "priority": n["priority"], "isPinned": !n["isPinned"], "isFavorite": n["isFavorite"], "isArchived": n["isArchived"], "isTrashed": n["isTrashed"], "checklist": n["checklist"], "createdAt": n["createdAt"], "updatedAt": time()};
             updatedList = append(updatedList, updated);
         } else {
             updatedList = append(updatedList, n);
         }
         i = i + 1;
     }
-
     engine["notes"] = updatedList;
     Storage.saveNotesToFile(updatedList, engine["filePath"]);
     return engine;
 };
-
-// ফেভারিট টগল করা
 let toggleFavorite = fn(engine, id) {
     let notes = engine["notes"];
     let updatedList = [];
     let i = 0;
-
     while (i < len(notes)) {
         let n = notes[i];
         if (n["id"] == id) {
-            let updated = {
-                "id": n["id"],
-                "title": n["title"],
-                "content": n["content"],
-                "category": n["category"],
-                "tags": n["tags"],
-                "color": n["color"],
-                "priority": n["priority"],
-                "isPinned": n["isPinned"],
-                "isFavorite": !n["isFavorite"],
-                "isArchived": n["isArchived"],
-                "isTrashed": n["isTrashed"],
-                "checklist": n["checklist"],
-                "createdAt": n["createdAt"],
-                "updatedAt": time()
-            };
+            let updated = {"id": n["id"], "title": n["title"], "content": n["content"], "category": n["category"], "tags": n["tags"], "color": n["color"], "priority": n["priority"], "isPinned": n["isPinned"], "isFavorite": !n["isFavorite"], "isArchived": n["isArchived"], "isTrashed": n["isTrashed"], "checklist": n["checklist"], "createdAt": n["createdAt"], "updatedAt": time()};
             updatedList = append(updatedList, updated);
         } else {
             updatedList = append(updatedList, n);
         }
         i = i + 1;
     }
-
     engine["notes"] = updatedList;
     Storage.saveNotesToFile(updatedList, engine["filePath"]);
     return engine;
 };
-
-// নোট ফিল্টারিং ও সার্চিং
 let getFilteredNotes = fn(engine) {
     let notes = engine["notes"];
     let cat = engine["activeCategory"];
     let query = lower(trim(engine["searchQuery"]));
     let tag = engine["selectedTag"];
-
     let result = [];
     let i = 0;
-
     while (i < len(notes)) {
         let n = notes[i];
         let isMatch = true;
-
-        // ট্র্যাশ বা আর্কাইভ চেক
         if (cat == "trash") {
-            if (!n["isTrashed"]) { isMatch = false; }
-        } else if (cat == "archive") {
-            if (!n["isArchived"] || n["isTrashed"]) { isMatch = false; }
+            if (!n["isTrashed"]) {
+                isMatch = false;
+            }
         } else {
-            if (n["isTrashed"] || n["isArchived"]) { isMatch = false; }
-
-            if (cat == "important") {
-                if (!n["isPinned"] && !n["isFavorite"]) { isMatch = false; }
-            } else if (cat != "all" && cat != "") {
-                if (n["category"] != cat) { isMatch = false; }
+            if (cat == "archive") {
+                if (!n["isArchived"] || n["isTrashed"]) {
+                    isMatch = false;
+                }
+            } else {
+                if (n["isTrashed"] || n["isArchived"]) {
+                    isMatch = false;
+                }
+                if (cat == "important") {
+                    if (!n["isPinned"] && !n["isFavorite"]) {
+                        isMatch = false;
+                    }
+                } else {
+                    if (cat != "all" && cat != "") {
+                        if (n["category"] != cat) {
+                            isMatch = false;
+                        }
+                    }
+                }
             }
         }
-
-        // ট্যাগ ফিল্টার
         if (isMatch && tag != "") {
             let hasTag = false;
             let t = 0;
@@ -250,10 +158,10 @@ let getFilteredNotes = fn(engine) {
                 }
                 t = t + 1;
             }
-            if (!hasTag) { isMatch = false; }
+            if (!hasTag) {
+                isMatch = false;
+            }
         }
-
-        // সার্চ কুয়েরি ফিল্টার
         if (isMatch && query != "") {
             let inTitle = contains(lower(n["title"]), query);
             let inContent = contains(lower(n["content"]), query);
@@ -261,14 +169,11 @@ let getFilteredNotes = fn(engine) {
                 isMatch = false;
             }
         }
-
         if (isMatch) {
             result = append(result, n);
         }
         i = i + 1;
     }
-
-    // পিন্ড নোটগুলো শুরুতে রাখা (Sorting)
     let pinnedList = [];
     let unpinnedList = [];
     let r = 0;
@@ -280,7 +185,6 @@ let getFilteredNotes = fn(engine) {
         }
         r = r + 1;
     }
-
     let finalSorted = [];
     let p = 0;
     while (p < len(pinnedList)) {
@@ -292,11 +196,8 @@ let getFilteredNotes = fn(engine) {
         finalSorted = append(finalSorted, unpinnedList[u]);
         u = u + 1;
     }
-
     return finalSorted;
 };
-
-// সামগ্রিক পরিসংখ্যান (Analytics & Stats)
 let getAnalytics = fn(engine) {
     let notes = engine["notes"];
     let total = len(notes);
@@ -309,51 +210,40 @@ let getAnalytics = fn(engine) {
     let totalChars = 0;
     let totalTodos = 0;
     let completedTodos = 0;
-
     let i = 0;
     while (i < total) {
         let n = notes[i];
         if (n["isTrashed"]) {
             trashed = trashed + 1;
-        } else if (n["isArchived"]) {
-            archived = archived + 1;
         } else {
-            active = active + 1;
-            if (n["isPinned"]) { pinned = pinned + 1; }
-            if (n["isFavorite"]) { favorites = favorites + 1; }
-
-            totalWords = totalWords + Markdown.countWords(n["title"]) + Markdown.countWords(n["content"]);
-            totalChars = totalChars + len(n["title"]) + len(n["content"]);
-
-            let checks = n["checklist"];
-            let c = 0;
-            while (c < len(checks)) {
-                totalTodos = totalTodos + 1;
-                if (checks[c]["completed"]) {
-                    completedTodos = completedTodos + 1;
+            if (n["isArchived"]) {
+                archived = archived + 1;
+            } else {
+                active = active + 1;
+                if (n["isPinned"]) {
+                    pinned = pinned + 1;
                 }
-                c = c + 1;
+                if (n["isFavorite"]) {
+                    favorites = favorites + 1;
+                }
+                totalWords = totalWords + Markdown.countWords(n["title"]) + Markdown.countWords(n["content"]);
+                totalChars = totalChars + len(n["title"]) + len(n["content"]);
+                let checks = n["checklist"];
+                let c = 0;
+                while (c < len(checks)) {
+                    totalTodos = totalTodos + 1;
+                    if (checks[c]["completed"]) {
+                        completedTodos = completedTodos + 1;
+                    }
+                    c = c + 1;
+                }
             }
         }
         i = i + 1;
     }
-
     let todoProgress = 0;
     if (totalTodos > 0) {
-        todoProgress = (completedTodos * 100) / totalTodos;
+        todoProgress = completedTodos * 100 / totalTodos;
     }
-
-    return {
-        "totalNotes": total,
-        "activeNotes": active,
-        "pinnedNotes": pinned,
-        "favoriteNotes": favorites,
-        "archivedNotes": archived,
-        "trashedNotes": trashed,
-        "totalWords": totalWords,
-        "totalChars": totalChars,
-        "totalTodos": totalTodos,
-        "completedTodos": completedTodos,
-        "todoProgress": todoProgress
-    };
+    return {"totalNotes": total, "activeNotes": active, "pinnedNotes": pinned, "favoriteNotes": favorites, "archivedNotes": archived, "trashedNotes": trashed, "totalWords": totalWords, "totalChars": totalChars, "totalTodos": totalTodos, "completedTodos": completedTodos, "todoProgress": todoProgress};
 };

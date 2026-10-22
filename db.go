@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -44,6 +45,11 @@ func NewStore(filePath string) (*Store, error) {
 	}
 
 	if err := s.load(); err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			if raw, readErr := os.ReadFile(filePath); readErr == nil && len(raw) > 0 {
+				_ = os.WriteFile(filePath+".bak", raw, 0644)
+			}
+		}
 		s.seedDefaults()
 		if err := s.save(); err != nil {
 			return nil, fmt.Errorf("failed to save initial store: %w", err)
@@ -151,7 +157,11 @@ func (s *Store) save() error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(s.filePath, data, 0644)
+	tmpPath := s.filePath + ".tmp"
+	if err := os.WriteFile(tmpPath, data, 0644); err != nil {
+		return err
+	}
+	return os.Rename(tmpPath, s.filePath)
 }
 
 func (s *Store) GetAll() []Note {
@@ -246,16 +256,16 @@ func (s *Store) Delete(id string) error {
 // POS Models & Store
 // ────────────────────────────────────────────────────────────────────
 type POSProduct struct {
-	ID         string  `json:"id"`
-	Name       string  `json:"name"`
-	NameEn     string  `json:"nameEn"`
-	SKU        string  `json:"sku"`
-	Barcode    string  `json:"barcode"`
-	Price      float64 `json:"price"`
-	WAC        float64 `json:"wac"`
-	Stock      int     `json:"stock"`
-	Category   string  `json:"category"`
-	Icon       string  `json:"icon"`
+	ID       string  `json:"id"`
+	Name     string  `json:"name"`
+	NameEn   string  `json:"nameEn"`
+	SKU      string  `json:"sku"`
+	Barcode  string  `json:"barcode"`
+	Price    float64 `json:"price"`
+	WAC      float64 `json:"wac"`
+	Stock    int     `json:"stock"`
+	Category string  `json:"category"`
+	Icon     string  `json:"icon"`
 }
 
 type POSCartItem struct {
@@ -422,4 +432,3 @@ func GetDefaultMusicTracks() []MusicTrack {
 		},
 	}
 }
-

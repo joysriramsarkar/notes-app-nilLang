@@ -1,23 +1,16 @@
-// src/ui/NoteList.nil
-// নীলাং নোট অ্যাপ — নোট তালিকা ও গ্রিড কার্ড ভিউ
-
 import "../domain/theme.nil" as Theme;
 import "../domain/markdown.nil" as Markdown;
 import "../domain/checklist.nil" as Checklist;
-
-// টার্মিনালে নোট কার্ড তালিকা রেন্ডার
 let renderNoteList = fn(notes, activeNoteId) {
     if (len(notes) == 0) {
         return Theme.ANSI_FG_YELLOW + "  (কোনো নোট পাওয়া যায়নি। নতুন নোট তৈরি করতে 'n' চাপুন)\n" + Theme.ANSI_RESET;
     }
-
     let out = "";
     let i = 0;
     while (i < len(notes)) {
         let n = notes[i];
         let indexNum = str(i + 1);
-        let isSelected = (n["id"] == activeNoteId);
-
+        let isSelected = n["id"] == activeNoteId;
         let pinBadge = "";
         if (n["isPinned"]) {
             pinBadge = " 📌";
@@ -26,30 +19,22 @@ let renderNoteList = fn(notes, activeNoteId) {
         if (n["isFavorite"]) {
             favBadge = " ⭐";
         }
-
         let selectMarker = "  ";
         let cardColor = Theme.ANSI_FG_WHITE;
         if (isSelected) {
             selectMarker = "👉 ";
             cardColor = Theme.ANSI_FG_BRIGHT_CYAN + Theme.ANSI_BOLD;
         }
-
         out = out + cardColor + selectMarker + "[" + indexNum + "] " + n["title"] + pinBadge + favBadge + Theme.ANSI_RESET + "\n";
-
-        // Excerpt
         let excerpt = Markdown.getExcerpt(n["content"], 50);
         if (excerpt != "") {
             out = out + "     " + Theme.ANSI_DIM + excerpt + Theme.ANSI_RESET + "\n";
         }
-
-        // Checklist Progress
         let checks = n["checklist"];
         if (len(checks) > 0) {
             let prog = Checklist.calcProgress(checks);
             out = out + "     " + Theme.ANSI_FG_BRIGHT_GREEN + prog["progressBar"] + Theme.ANSI_RESET + "\n";
         }
-
-        // Tags & Date
         let tagStr = "";
         let t = 0;
         while (t < len(n["tags"])) {
@@ -58,55 +43,33 @@ let renderNoteList = fn(notes, activeNoteId) {
         }
         let dateStr = Markdown.formatDate(n["updatedAt"]);
         out = out + "     " + Theme.ANSI_FG_MAGENTA + tagStr + Theme.ANSI_DIM + "• " + dateStr + Theme.ANSI_RESET + "\n\n";
-
         i = i + 1;
     }
-
     return out;
 };
-
-// Alap UI ডিক্লারেটিভ নোটলিস্ট কম্পোনেন্ট
 let renderAlapNoteList = fn(notes, activeNoteId, onSelectNote) {
     let items = [];
     let i = 0;
     while (i < len(notes)) {
         let n = notes[i];
-        let isSelected = (n["id"] == activeNoteId);
-        let card = {
-            "type": "Column",
-            "padding": 12,
-            "margin": {"bottom": 8},
-            "background": isSelected ? "#1E293B" : "#0F172A",
-            "borderRadius": 8,
-            "border": isSelected ? {"width": 1, "color": "#6366F1"} : null,
-            "onClick": fn() { onSelectNote(n["id"]); },
-            "children": [
-                {
-                    "type": "Row",
-                    "children": [
-                        {"type": "Text", "text": n["title"], "fontSize": 16, "fontWeight": "bold", "color": "#F8FAFC", "grow": true},
-                        {"type": "Text", "text": n["isPinned"] ? "📌" : "", "fontSize": 14}
-                    ]
-                },
-                {
-                    "type": "Text",
-                    "text": Markdown.getExcerpt(n["content"], 60),
-                    "fontSize": 13,
-                    "color": "#94A3B8",
-                    "margin": {"top": 4, "bottom": 6}
-                }
-            ]
-        };
+        let isSelected = n["id"] == activeNoteId;
+        let card = {"type": "Column", "padding": 12, "margin": {"bottom": 8}, "background": if (isSelected) {
+            "#1E293B";
+        } else {
+            "#0F172A";
+        }, "borderRadius": 8, "border": if (isSelected) {
+            {"width": 1, "color": "#6366F1"};
+        } else {
+            null;
+        }, "onClick": fn() {
+            onSelectNote(n["id"]);
+        }, "children": [{"type": "Row", "children": [{"type": "Text", "text": n["title"], "fontSize": 16, "fontWeight": "bold", "color": "#F8FAFC", "grow": true}, {"type": "Text", "text": if (n["isPinned"]) {
+            "📌";
+        } else {
+            "";
+        }, "fontSize": 14}]}, {"type": "Text", "text": Markdown.getExcerpt(n["content"], 60), "fontSize": 13, "color": "#94A3B8", "margin": {"top": 4, "bottom": 6}}]};
         items = append(items, card);
         i = i + 1;
     }
-
-    return {
-        "type": "Column",
-        "width": 320,
-        "background": "#0F172A",
-        "padding": 12,
-        "scrollable": true,
-        "children": items
-    };
+    return {"type": "Column", "width": 320, "background": "#0F172A", "padding": 12, "scrollable": true, "children": items};
 };

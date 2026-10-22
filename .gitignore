@@ -1,0 +1,13 @@
+# Build artifacts & binaries
+build/
+*.exe
+*.exe~
+*.apk
+*.apk.idsig
+*.bak
+*.tmp
+
+# OS & Temp files
+.DS_Store
+Thumbs.db
+*.log

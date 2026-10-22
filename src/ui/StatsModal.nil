@@ -1,9 +1,4 @@
-// src/ui/StatsModal.nil
-// নীলাং নোট অ্যাপ — পরিসংখ্যান ও অ্যানালিটিক্স ড্যাশবোর্ড
-
 import "../domain/theme.nil" as Theme;
-
-// টার্মিনাল পরিসংখ্যান রিপোর্ট রেন্ডার
 let renderStatsView = fn(analytics) {
     let out = "";
     let border = "═";
@@ -13,7 +8,6 @@ let renderStatsView = fn(analytics) {
         b = b + border;
         i = i + 1;
     }
-
     out = out + Theme.ANSI_FG_BRIGHT_MAGENTA + "╔" + b + "╗\n" + Theme.ANSI_RESET;
     out = out + Theme.ANSI_BOLD + "║          📊 নীলাং নোটবুক পরিসংখ্যান ড্যাশবোর্ড           ║\n" + Theme.ANSI_RESET;
     out = out + Theme.ANSI_FG_BRIGHT_MAGENTA + "╠" + b + "╣\n" + Theme.ANSI_RESET;
@@ -28,43 +22,8 @@ let renderStatsView = fn(analytics) {
     out = out + "║  🔤 সর্বমোট অক্ষর:       " + str(analytics["totalChars"]) + " টি ক্যারেক্টার\n";
     out = out + "║  ✅ সম্পন্ন টাস্ক:       " + str(analytics["completedTodos"]) + " / " + str(analytics["totalTodos"]) + " (" + str(analytics["todoProgress"]) + "%)\n";
     out = out + Theme.ANSI_FG_BRIGHT_MAGENTA + "╚" + b + "╝\n" + Theme.ANSI_RESET;
-
     return out;
 };
-
-// Alap UI ডিক্লারেটিভ স্ট্যাটস মোডাল
 let renderAlapStatsModal = fn(analytics, onClose) {
-    return {
-        "type": "Column",
-        "position": "absolute",
-        "top": "15%",
-        "left": "25%",
-        "width": 450,
-        "background": "#1E293B",
-        "borderRadius": 16,
-        "padding": 24,
-        "shadow": {"x": 0, "y": 8, "blur": 32, "color": "black", "opacity": 0.5},
-        "children": [
-            {
-                "type": "Row",
-                "margin": {"bottom": 16},
-                "children": [
-                    {"type": "Text", "text": "📊 নীলাং নোটবুক পরিসংখ্যান", "fontSize": 18, "fontWeight": "bold", "color": "#F8FAFC", "grow": true},
-                    {"type": "Button", "text": "✕", "variant": "ghost", "onClick": onClose}
-                ]
-            },
-            {
-                "type": "Column",
-                "children": [
-                    {"type": "Text", "text": "📑 মোট নোট: " + str(analytics["totalNotes"]) + " টি", "color": "#CBD5E1"},
-                    {"type": "Text", "text": "🟢 সক্রিয় নোট: " + str(analytics["activeNotes"]) + " টি", "color": "#10B981"},
-                    {"type": "Text", "text": "📌 পিন্ড নোট: " + str(analytics["pinnedNotes"]) + " টি", "color": "#38BDF8"},
-                    {"type": "Text", "text": "⭐ ফেভারিট: " + str(analytics["favoriteNotes"]) + " টি", "color": "#F59E0B"},
-                    {"type": "Text", "text": "✍️ সর্বমোট শব্দ: " + str(analytics["totalWords"]) + " টি", "color": "#E2E8F0"},
-                    {"type": "Text", "text": "✅ সম্পন্ন টাস্ক: " + str(analytics["completedTodos"]) + "/" + str(analytics["totalTodos"]) + " (" + str(analytics["todoProgress"]) + "%)", "color": "#34D399"}
-                ]
-            }
-        ]
-    };
+    return {"type": "Column", "position": "absolute", "top": "15%", "left": "25%", "width": 450, "background": "#1E293B", "borderRadius": 16, "padding": 24, "shadow": {"x": 0, "y": 8, "blur": 32, "color": "black", "opacity": 0.5}, "children": [{"type": "Row", "margin": {"bottom": 16}, "children": [{"type": "Text", "text": "📊 নীলাং নোটবুক পরিসংখ্যান", "fontSize": 18, "fontWeight": "bold", "color": "#F8FAFC", "grow": true}, {"type": "Button", "text": "✕", "variant": "ghost", "onClick": onClose}]}, {"type": "Column", "children": [{"type": "Text", "text": "📑 মোট নোট: " + str(analytics["totalNotes"]) + " টি", "color": "#CBD5E1"}, {"type": "Text", "text": "🟢 সক্রিয় নোট: " + str(analytics["activeNotes"]) + " টি", "color": "#10B981"}, {"type": "Text", "text": "📌 পিন্ড নোট: " + str(analytics["pinnedNotes"]) + " টি", "color": "#38BDF8"}, {"type": "Text", "text": "⭐ ফেভারিট: " + str(analytics["favoriteNotes"]) + " টি", "color": "#F59E0B"}, {"type": "Text", "text": "✍️ সর্বমোট শব্দ: " + str(analytics["totalWords"]) + " টি", "color": "#E2E8F0"}, {"type": "Text", "text": "✅ সম্পন্ন টাস্ক: " + str(analytics["completedTodos"]) + "/" + str(analytics["totalTodos"]) + " (" + str(analytics["todoProgress"]) + "%)", "color": "#34D399"}]}]};
 };
-

@@ -1,29 +1,120 @@
-// src/notes_app.nil
-// নীলাং উইন্ডোজ নোটপ্যাড ও নোটবুক অ্যাপ — Alap ডিক্লারেটিভ UI কম্পোনেন্ট
-//
-// চালান (প্রজেক্ট রুট থেকে):
-//   ..\nilLang\bin\nil.exe check src/notes_app.nil
-//   ..\nilLang\bin\nil.exe render src/notes_app.nil
-
 import "./domain/notes.nil" as Notes;
 import "./domain/checklist.nil" as Checklist;
-
 let styleCatBtn = "display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#1e293b; color:#e2e8f0; border:1px solid #334155; cursor:pointer;";
 let styleCatActive = "display:inline-block; margin:4px; padding:10px 16px; border-radius:10px; background:#6366f1; color:#ffffff; border:none; font-weight:bold; cursor:pointer;";
 let styleActionBtn = "display:inline-block; margin:4px; padding:10px 18px; border-radius:10px; background:#0ea5e9; color:#ffffff; border:none; font-weight:bold; cursor:pointer;";
 let styleDangerBtn = "display:inline-block; margin:4px; padding:10px 18px; border-radius:10px; background:#ef4444; color:#ffffff; border:none; font-weight:bold; cursor:pointer;";
-
 component NotesApp {
     state engine = Notes.createNotesEngine();
     state statusMsg = "উইন্ডোজ নোটবুক প্রস্তুত (Ready)";
-
+    render {
+        let filtered = Notes.getFilteredNotes(engine);
+        let activeNote = Notes.getNoteById(engine, engine["activeNoteId"]);
+        if (activeNote == null && len(filtered) > 0) {
+            engine["activeNoteId"] = filtered[0]["id"];
+            activeNote = filtered[0];
+        }
+        let stats = Notes.getAnalytics(engine);
+        let content = [];
+        content = append(content, {"type": "Dashboard", "title": "📊 নোটবুক ওভারভিউ — " + statusMsg, "metrics": [{"label": "সক্রিয় নোট", "value": str(stats["activeNotes"]), "delta": "মোট " + str(stats["totalNotes"])}, {"label": "পিন্ড / জরুরি", "value": str(stats["pinnedNotes"]), "delta": "⭐ " + str(stats["favoriteNotes"]) + " ফেভারিট"}, {"label": "মোট শব্দ", "value": str(stats["totalWords"]), "delta": str(stats["totalChars"]) + " অক্ষর"}, {"label": "টাস্ক অগ্রগতি", "value": str(stats["todoProgress"]) + "%", "delta": str(stats["completedTodos"]) + "/" + str(stats["totalTodos"]) + " সম্পন্ন"}]});
+        let activeCat = engine["activeCategory"];
+        content = append(content, {"type": "Button", "id": "cat-all", "label": "📑 সকল নোট", "event": "selectCategory", "payload": "all", "style": if (activeCat == "all") {
+            styleCatActive;
+        } else {
+            styleCatBtn;
+        }});
+        content = append(content, {"type": "Button", "id": "cat-important", "label": "📌 জরুরি", "event": "selectCategory", "payload": "important", "style": if (activeCat == "important") {
+            styleCatActive;
+        } else {
+            styleCatBtn;
+        }});
+        content = append(content, {"type": "Button", "id": "cat-work", "label": "💼 কাজ (Work)", "event": "selectCategory", "payload": "work", "style": if (activeCat == "work") {
+            styleCatActive;
+        } else {
+            styleCatBtn;
+        }});
+        content = append(content, {"type": "Button", "id": "cat-personal", "label": "🏠 ব্যক্তিগত", "event": "selectCategory", "payload": "personal", "style": if (activeCat == "personal") {
+            styleCatActive;
+        } else {
+            styleCatBtn;
+        }});
+        content = append(content, {"type": "Button", "id": "cat-ideas", "label": "💡 আইডিয়া", "event": "selectCategory", "payload": "ideas", "style": if (activeCat == "ideas") {
+            styleCatActive;
+        } else {
+            styleCatBtn;
+        }});
+        content = append(content, {"type": "Button", "id": "btn-new-note", "label": "➕ নতুন নোট তৈরি করুন", "event": "createQuickNote", "payload": "", "style": styleActionBtn});
+        let rows = [];
+        let i = 0;
+        while (i < len(filtered)) {
+            let n = filtered[i];
+            let badges = "";
+            if (n["isPinned"]) {
+                badges = badges + "📌 ";
+            }
+            if (n["isFavorite"]) {
+                badges = badges + "⭐ ";
+            }
+            let marker = if (n["id"] == engine["activeNoteId"]) {
+                "▶ ";
+            } else {
+                "";
+            };
+            rows = append(rows, [str(i + 1), marker + badges + n["title"], n["category"], join(n["tags"], ", "), str(len(n["checklist"])) + " টি টাস্ক"]);
+            i = i + 1;
+        }
+        content = append(content, {"type": "Table", "headers": ["#", "শিরোনাম", "ক্যাটাগরি", "ট্যাগসমূহ", "চেকলিস্ট"], "rows": rows});
+        let j = 0;
+        while (j < len(filtered)) {
+            let item = filtered[j];
+            content = append(content, {"type": "Button", "id": "select-" + item["id"], "label": "📖 পড়ুন: " + item["title"], "event": "selectNote", "payload": item["id"], "style": if (item["id"] == engine["activeNoteId"]) {
+                styleCatActive;
+            } else {
+                styleCatBtn;
+            }});
+            j = j + 1;
+        }
+        if (activeNote != null) {
+            let checkSummary = "";
+            let checks = activeNote["checklist"];
+            if (len(checks) > 0) {
+                checkSummary = "\n\n✅ চেকলিস্ট:\n";
+                let c = 0;
+                while (c < len(checks)) {
+                    let item = checks[c];
+                    let box = if (item["completed"]) {
+                        "[✓] ";
+                    } else {
+                        "[ ] ";
+                    };
+                    checkSummary = checkSummary + "  " + box + item["text"] + "\n";
+                    c = c + 1;
+                }
+            }
+            let metaLine = "ক্যাটাগরি: " + activeNote["category"] + " | রঙ: " + activeNote["color"] + " | ট্যাগ: #" + join(activeNote["tags"], " #") + "\n────────────────────────────────────────\n";
+            content = append(content, {"type": "Card", "title": "📝 " + activeNote["title"], "body": metaLine + activeNote["content"] + checkSummary});
+            content = append(content, {"type": "Button", "id": "btn-pin", "label": if (activeNote["isPinned"]) {
+                "📌 আনপিন করুন";
+            } else {
+                "📌 পিন করুন";
+            }, "event": "togglePinActive", "payload": "", "style": styleCatBtn});
+            content = append(content, {"type": "Button", "id": "btn-fav", "label": if (activeNote["isFavorite"]) {
+                "⭐ ফেভারিট সরান";
+            } else {
+                "⭐ ফেভারিট করুন";
+            }, "event": "toggleFavActive", "payload": "", "style": styleCatBtn});
+            content = append(content, {"type": "Button", "id": "btn-delete", "label": "🗑️ ট্র্যাশে পাঠান", "event": "deleteActive", "payload": "", "style": styleDangerBtn});
+        } else {
+            content = append(content, {"type": "Card", "title": "কোনো নোট নেই", "body": "এই ক্যাটাগরিতে কোনো নোট পাওয়া যায়নি। '+ নতুন নোট তৈরি করুন' বাটনে ক্লিক করুন।"});
+        }
+        return {"type": "Page", "title": "📝 নীলাং উইন্ডোজ নোটস অ্যাপ (Nilang Windows Notes)", "navigation": {"brand": "NilNotes Win11", "items": [{"label": "নোটবুক", "path": "/"}, {"label": "চেকলিস্ট", "path": "#checklist"}, {"label": "অ্যানালিটিক্স", "path": "#stats"}]}, "content": content, "footer": "সম্পূর্ণ নীলাং (.nil) ও আলাপ (Alap) ফ্রেমওয়ার্কে তৈরি • Windows / Linux / Onuron OS"};
+    }
     on selectCategory(cat) {
         if (cat != null && cat != "") {
             engine["activeCategory"] = str(cat);
             statusMsg = "ক্যাটাগরি ফিল্টার: " + str(cat);
         }
     }
-
     on selectNote(noteId) {
         if (noteId != null && noteId != "") {
             engine["activeNoteId"] = str(noteId);
@@ -33,224 +124,33 @@ component NotesApp {
             }
         }
     }
-
-    on createQuickNote() {
+    on createQuickNote {
         let count = Notes.getCount(engine) + 1;
         let title = "উইন্ডোজ কুইক নোট #" + str(count);
         let body = "নীলাং উইন্ডোজ নোটস অ্যাপ থেকে তৈরি নতুন নোট।\n- দ্রুত নোট সংরক্ষণ\n- মার্কডাউন ও চেকলিস্ট সাপোর্ট";
-        let checks = [
-            Checklist.createCheckItem("c-1", "প্রাথমিক খসড়া সম্পন্ন", true),
-            Checklist.createCheckItem("c-2", "চূড়ান্ত রিভিউ করা", false)
-        ];
+        let checks = [Checklist.createCheckItem("c-1", "প্রাথমিক খসড়া সম্পন্ন", true), Checklist.createCheckItem("c-2", "চূড়ান্ত রিভিউ করা", false)];
         engine = Notes.addNote(engine, title, body, "work", ["উইন্ডোজ", "নীলাং"], "indigo", "high", true, false, checks);
         statusMsg = "নতুন নোট তৈরি হয়েছে: " + title;
     }
-
-    on togglePinActive() {
+    on togglePinActive {
         let activeId = engine["activeNoteId"];
         if (activeId != "") {
             engine = Notes.togglePin(engine, activeId);
             statusMsg = "নোটের পিন স্ট্যাটাস পরিবর্তিত হয়েছে";
         }
     }
-
-    on toggleFavActive() {
+    on toggleFavActive {
         let activeId = engine["activeNoteId"];
         if (activeId != "") {
             engine = Notes.toggleFavorite(engine, activeId);
             statusMsg = "নোটের ফেভারিট স্ট্যাটাস পরিবর্তিত হয়েছে";
         }
     }
-
-    on deleteActive() {
+    on deleteActive {
         let activeId = engine["activeNoteId"];
         if (activeId != "") {
             engine = Notes.deleteNote(engine, activeId);
             statusMsg = "নোট ট্র্যাশে পাঠানো হয়েছে";
         }
-    }
-
-    render {
-        let filtered = Notes.getFilteredNotes(engine);
-        let activeNote = Notes.getNoteById(engine, engine["activeNoteId"]);
-        if (activeNote == null && len(filtered) > 0) {
-            engine["activeNoteId"] = filtered[0]["id"];
-            activeNote = filtered[0];
-        }
-
-        let stats = Notes.getAnalytics(engine);
-        let content = [];
-
-        // ১. পরিসংখ্যান ড্যাশবোর্ড (Live Metrics)
-        content = append(content, {
-            "type": "Dashboard",
-            "title": "📊 নোটবুক ওভারভিউ — " + statusMsg,
-            "metrics": [
-                {"label": "সক্রিয় নোট", "value": str(stats["activeNotes"]), "delta": "মোট " + str(stats["totalNotes"])},
-                {"label": "পিন্ড / জরুরি", "value": str(stats["pinnedNotes"]), "delta": "⭐ " + str(stats["favoriteNotes"]) + " ফেভারিট"},
-                {"label": "মোট শব্দ", "value": str(stats["totalWords"]), "delta": str(stats["totalChars"]) + " অক্ষর"},
-                {"label": "টাস্ক অগ্রগতি", "value": str(stats["todoProgress"]) + "%", "delta": str(stats["completedTodos"]) + "/" + str(stats["totalTodos"]) + " সম্পন্ন"}
-            ]
-        });
-
-        // ২. ক্যাটাগরি ফিল্টার ও অ্যাকশন টুলবার
-        let activeCat = engine["activeCategory"];
-        content = append(content, {
-            "type": "Button",
-            "id": "cat-all",
-            "label": "📑 সকল নোট",
-            "event": "selectCategory",
-            "payload": "all",
-            "style": activeCat == "all" ? styleCatActive : styleCatBtn
-        });
-        content = append(content, {
-            "type": "Button",
-            "id": "cat-important",
-            "label": "📌 জরুরি",
-            "event": "selectCategory",
-            "payload": "important",
-            "style": activeCat == "important" ? styleCatActive : styleCatBtn
-        });
-        content = append(content, {
-            "type": "Button",
-            "id": "cat-work",
-            "label": "💼 কাজ (Work)",
-            "event": "selectCategory",
-            "payload": "work",
-            "style": activeCat == "work" ? styleCatActive : styleCatBtn
-        });
-        content = append(content, {
-            "type": "Button",
-            "id": "cat-personal",
-            "label": "🏠 ব্যক্তিগত",
-            "event": "selectCategory",
-            "payload": "personal",
-            "style": activeCat == "personal" ? styleCatActive : styleCatBtn
-        });
-        content = append(content, {
-            "type": "Button",
-            "id": "cat-ideas",
-            "label": "💡 আইডিয়া",
-            "event": "selectCategory",
-            "payload": "ideas",
-            "style": activeCat == "ideas" ? styleCatActive : styleCatBtn
-        });
-        content = append(content, {
-            "type": "Button",
-            "id": "btn-new-note",
-            "label": "➕ নতুন নোট তৈরি করুন",
-            "event": "createQuickNote",
-            "payload": "",
-            "style": styleActionBtn
-        });
-
-        // ৩. নোটের তালিকা (Table View + Selection Buttons)
-        let rows = [];
-        let i = 0;
-        while (i < len(filtered)) {
-            let n = filtered[i];
-            let badges = "";
-            if (n["isPinned"]) { badges = badges + "📌 "; }
-            if (n["isFavorite"]) { badges = badges + "⭐ "; }
-            let marker = n["id"] == engine["activeNoteId"] ? "▶ " : "";
-            rows = append(rows, [
-                str(i + 1),
-                marker + badges + n["title"],
-                n["category"],
-                join(n["tags"], ", "),
-                str(len(n["checklist"])) + " টি টাস্ক"
-            ]);
-            i = i + 1;
-        }
-
-        content = append(content, {
-            "type": "Table",
-            "headers": ["#", "শিরোনাম", "ক্যাটাগরি", "ট্যাগসমূহ", "চেকলিস্ট"],
-            "rows": rows
-        });
-
-        // নোট নির্বাচনের কুইক বাটন
-        let j = 0;
-        while (j < len(filtered)) {
-            let item = filtered[j];
-            content = append(content, {
-                "type": "Button",
-                "id": "select-" + item["id"],
-                "label": "📖 পড়ুন: " + item["title"],
-                "event": "selectNote",
-                "payload": item["id"],
-                "style": item["id"] == engine["activeNoteId"] ? styleCatActive : styleCatBtn
-            });
-            j = j + 1;
-        }
-
-        // ৪. নির্বাচিত নোটের বিস্তারিত ভিউ ও এডিটর কন্ট্রোল
-        if (activeNote != null) {
-            let checkSummary = "";
-            let checks = activeNote["checklist"];
-            if (len(checks) > 0) {
-                checkSummary = "\n\n✅ চেকলিস্ট:\n";
-                let c = 0;
-                while (c < len(checks)) {
-                    let item = checks[c];
-                    let box = item["completed"] ? "[✓] " : "[ ] ";
-                    checkSummary = checkSummary + "  " + box + item["text"] + "\n";
-                    c = c + 1;
-                }
-            }
-
-            let metaLine = "ক্যাটাগরি: " + activeNote["category"] + " | রঙ: " + activeNote["color"] + " | ট্যাগ: #" + join(activeNote["tags"], " #") + "\n────────────────────────────────────────\n";
-            content = append(content, {
-                "type": "Card",
-                "title": "📝 " + activeNote["title"],
-                "body": metaLine + activeNote["content"] + checkSummary
-            });
-
-            content = append(content, {
-                "type": "Button",
-                "id": "btn-pin",
-                "label": activeNote["isPinned"] ? "📌 আনপিন করুন" : "📌 পিন করুন",
-                "event": "togglePinActive",
-                "payload": "",
-                "style": styleCatBtn
-            });
-            content = append(content, {
-                "type": "Button",
-                "id": "btn-fav",
-                "label": activeNote["isFavorite"] ? "⭐ ফেভারিট সরান" : "⭐ ফেভারিট করুন",
-                "event": "toggleFavActive",
-                "payload": "",
-                "style": styleCatBtn
-            });
-            content = append(content, {
-                "type": "Button",
-                "id": "btn-delete",
-                "label": "🗑️ ট্র্যাশে পাঠান",
-                "event": "deleteActive",
-                "payload": "",
-                "style": styleDangerBtn
-            });
-        } else {
-            content = append(content, {
-                "type": "Card",
-                "title": "কোনো নোট নেই",
-                "body": "এই ক্যাটাগরিতে কোনো নোট পাওয়া যায়নি। '+ নতুন নোট তৈরি করুন' বাটনে ক্লিক করুন।"
-            });
-        }
-
-        return {
-            "type": "Page",
-            "title": "📝 নীলাং উইন্ডোজ নোটস অ্যাপ (Nilang Windows Notes)",
-            "navigation": {
-                "brand": "NilNotes Win11",
-                "items": [
-                    {"label": "নোটবুক", "path": "/"},
-                    {"label": "চেকলিস্ট", "path": "#checklist"},
-                    {"label": "অ্যানালিটিক্স", "path": "#stats"}
-                ]
-            },
-            "content": content,
-            "footer": "সম্পূর্ণ নীলাং (.nil) ও আলাপ (Alap) ফ্রেমওয়ার্কে তৈরি • Windows / Linux / Onuron OS"
-        };
     }
 }

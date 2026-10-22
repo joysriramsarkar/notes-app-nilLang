@@ -1,27 +1,13 @@
-// src/domain/checklist.nil
-// নীলাং নোট অ্যাপ — চেকলিস্ট (To-Do) ইঞ্জিন
-
-// নতুন চেকলিস্ট আইটেম তৈরি
 let createCheckItem = fn(id, text, completed) {
-    return {
-        "id": id,
-        "text": text,
-        "completed": completed
-    };
+    return {"id": id, "text": text, "completed": completed};
 };
-
-// চেকলিস্ট আইটেম টগল করা
 let toggleCheckItem = fn(items, itemId) {
     let result = [];
     let i = 0;
     while (i < len(items)) {
         let item = items[i];
         if (item["id"] == itemId) {
-            let updated = {
-                "id": item["id"],
-                "text": item["text"],
-                "completed": !item["completed"]
-            };
+            let updated = {"id": item["id"], "text": item["text"], "completed": !item["completed"]};
             result = append(result, updated);
         } else {
             result = append(result, item);
@@ -30,15 +16,11 @@ let toggleCheckItem = fn(items, itemId) {
     }
     return result;
 };
-
-// চেকলিস্টে নতুন আইটেম যোগ
 let addCheckItem = fn(items, text) {
     let nextId = "chk-" + str(len(items) + 1) + "-" + str(time());
     let newItem = createCheckItem(nextId, text, false);
     return append(items, newItem);
 };
-
-// চেকলিস্ট থেকে আইটেম মুছে ফেলা
 let removeCheckItem = fn(items, itemId) {
     let result = [];
     let i = 0;
@@ -51,19 +33,11 @@ let removeCheckItem = fn(items, itemId) {
     }
     return result;
 };
-
-// চেকলিস্ট অগ্রগতি (Progress) পরিমাপ
 let calcProgress = fn(items) {
     let total = len(items);
     if (total == 0) {
-        return {
-            "total": 0,
-            "done": 0,
-            "percent": 0,
-            "progressBar": "[—]"
-        };
+        return {"total": 0, "done": 0, "percent": 0, "progressBar": "[—]"};
     }
-
     let done = 0;
     let i = 0;
     while (i < total) {
@@ -72,12 +46,9 @@ let calcProgress = fn(items) {
         }
         i = i + 1;
     }
-
-    let percent = (done * 100) / total;
-
-    // ভিজ্যুয়াল প্রোগ্রেস বার [████░░░░]
+    let percent = done * 100 / total;
     let barTotal = 10;
-    let filled = (percent * barTotal) / 100;
+    let filled = percent * barTotal / 100;
     let bar = "";
     let b = 0;
     while (b < barTotal) {
@@ -88,16 +59,8 @@ let calcProgress = fn(items) {
         }
         b = b + 1;
     }
-
-    return {
-        "total": total,
-        "done": done,
-        "percent": percent,
-        "progressBar": "[" + bar + "] " + str(percent) + "% (" + str(done) + "/" + str(total) + ")"
-    };
+    return {"total": total, "done": done, "percent": percent, "progressBar": "[" + bar + "] " + str(percent) + "% (" + str(done) + "/" + str(total) + ")"};
 };
-
-// চেকলিস্টকে মার্কডাউনে রূপান্তর
 let toMarkdown = fn(items) {
     let out = "";
     let i = 0;

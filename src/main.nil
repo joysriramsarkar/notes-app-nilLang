@@ -1,7 +1,3 @@
-// src/main.nil
-// আধুনিক নোট অ্যাপ (Nilang Notes) — সম্পূর্ণ নীলাং ভাষায় তৈরি
-// Features: Rich Notes, Categories, Checklists, Full-Text Search, Analytics, Persistence & QEMU Ready
-
 import "./domain/types.nil" as Types;
 import "./domain/checklist.nil" as Checklist;
 import "./domain/markdown.nil" as Markdown;
@@ -13,17 +9,18 @@ import "./ui/Sidebar.nil" as Sidebar;
 import "./ui/NoteList.nil" as NoteList;
 import "./ui/NoteEditor.nil" as NoteEditor;
 import "./ui/StatsModal.nil" as StatsModal;
-
-// মূল অ্যাপ্লিকেশন ফাংশন
 let main = fn() {
-    // safeInput reads a line from stdin; returns empty string on EOF.
     let safeInput = fn(prompt) {
         let raw = input(prompt);
-        if (raw == null) { return ""; }
+        if (raw == null) {
+            return "";
+        }
         return raw;
     };
     let safeParseInt = fn(s) {
-        if (s == null || s == "") { return -1; }
+        if (s == null || s == "") {
+            return -1;
+        }
         let i = 0;
         while (i < len(s)) {
             if (!contains("0123456789", s[i])) {
@@ -36,17 +33,10 @@ let main = fn() {
     let engine = Notes.createNotesEngine();
     let currentTheme = "dark";
     let showStats = false;
-
-    // উইন্ডোজে ইন্টারঅ্যাক্টিভভাবে চালালে সরাসরি আদর্শ মিনিমাল Win32 নোটপ্যাড উইন্ডো খুলবে
-    let notepadConfig = {
-        "appTitle": "নীলাং নোটপ্যাড",
-        "initialText": ""
-    };
+    let notepadConfig = {"appTitle": "নীলাং নোটপ্যাড", "initialText": ""};
     if (native("__nil_win32_notes_gui", notepadConfig)) {
         return null;
     }
-
-    // Alap ডিক্লারেটিভ গ্রাফিক্যাল UI ট্রি (Graphical GUI Tree for Android, Onuron & Desktop)
     let buildUI = fn() {
         let filtered = Notes.getFilteredNotes(engine);
         let activeNote = Notes.getNoteById(engine, engine["activeNoteId"]);
@@ -54,73 +44,44 @@ let main = fn() {
             engine["activeNoteId"] = filtered[0]["id"];
             activeNote = filtered[0];
         }
-
-        let mainContent = {
-            "type": "Row",
-            "fill": true,
-            "children": [
-                Sidebar.renderAlapSidebar(engine["activeCategory"], fn(catId) {
-                    engine["activeCategory"] = catId;
-                }),
-                NoteList.renderAlapNoteList(filtered, engine["activeNoteId"], fn(noteId) {
-                    engine["activeNoteId"] = noteId;
-                }),
-                NoteEditor.renderAlapNoteEditor(
-                    activeNote,
-                    fn(newTitle) {
-                        if (activeNote != null) {
-                            activeNote["title"] = newTitle;
-                        }
-                    },
-                    fn(newContent) {
-                        if (activeNote != null) {
-                            activeNote["content"] = newContent;
-                        }
-                    },
-                    fn() {
-                        if (activeNote != null) {
-                            activeNote["isPinned"] = !activeNote["isPinned"];
-                        }
-                    },
-                    fn() {
-                        if (activeNote != null) {
-                            activeNote["isFavorite"] = !activeNote["isFavorite"];
-                        }
-                    },
-                    fn() {
-                        if (activeNote != null) {
-                            activeNote["isTrashed"] = true;
-                        }
-                    }
-                )
-            ]
-        };
-
-        let rootChildren = [
-            Header.renderAlapHeader("নীলাং নোটবুক (Nilang Notes)", fn(q) {
-                engine["searchQuery"] = q;
-            }, fn() {
-                engine = Notes.addNote(engine, "নতুন নোট", "", "personal", [], "indigo", "medium", false, false, []);
-            }),
-            mainContent
-        ];
-
+        let mainContent = {"type": "Row", "fill": true, "children": [Sidebar.renderAlapSidebar(engine["activeCategory"], fn(catId) {
+            engine["activeCategory"] = catId;
+        }), NoteList.renderAlapNoteList(filtered, engine["activeNoteId"], fn(noteId) {
+            engine["activeNoteId"] = noteId;
+        }), NoteEditor.renderAlapNoteEditor(activeNote, fn(newTitle) {
+            if (activeNote != null) {
+                activeNote["title"] = newTitle;
+            }
+        }, fn(newContent) {
+            if (activeNote != null) {
+                activeNote["content"] = newContent;
+            }
+        }, fn() {
+            if (activeNote != null) {
+                activeNote["isPinned"] = !activeNote["isPinned"];
+            }
+        }, fn() {
+            if (activeNote != null) {
+                activeNote["isFavorite"] = !activeNote["isFavorite"];
+            }
+        }, fn() {
+            if (activeNote != null) {
+                activeNote["isTrashed"] = true;
+            }
+        })]};
+        let rootChildren = [Header.renderAlapHeader("নীলাং নোটবুক (Nilang Notes)", fn(q) {
+            engine["searchQuery"] = q;
+        }, fn() {
+            engine = Notes.addNote(engine, "নতুন নোট", "", "personal", [], "indigo", "medium", false, false, []);
+        }), mainContent];
         if (showStats) {
             let analytics = Notes.getAnalytics(engine);
             rootChildren = append(rootChildren, StatsModal.renderAlapStatsModal(analytics, fn() {
                 showStats = false;
             }));
         }
-
-        return {
-            "type": "Column",
-            "children": rootChildren,
-            "fill": true,
-            "background": "#0B0F19"
-        };
+        return {"type": "Column", "children": rootChildren, "fill": true, "background": "#0B0F19"};
     };
-
-    // অ্যাপ ব্যানার
     puts(Theme.ANSI_FG_BRIGHT_CYAN + Theme.ANSI_BOLD);
     puts("  ███╗   ██╗██╗██╗      █████╗ ███╗   ██╗ ██████╗ ");
     puts("  ████╗  ██║██║██║     ██╔══██╗████╗  ██║██╔════╝ ");
@@ -131,10 +92,7 @@ let main = fn() {
     puts("        📝 আধুনিক নোটবুক — NILANG NOTES v1.0       ");
     puts("     Cross-Platform & Graphical Alap Edition       " + Theme.ANSI_RESET);
     puts("");
-
     let running = true;
-
-
     while (running) {
         let filtered = Notes.getFilteredNotes(engine);
         let activeNote = Notes.getNoteById(engine, engine["activeNoteId"]);
@@ -142,176 +100,199 @@ let main = fn() {
             engine["activeNoteId"] = filtered[0]["id"];
             activeNote = filtered[0];
         }
-
-        // স্ক্রিন ড্র করা
         puts(Header.renderHeader(engine["activeCategory"], engine["searchQuery"], len(filtered)));
         puts("");
-
         if (showStats) {
             let analytics = Notes.getAnalytics(engine);
             puts(StatsModal.renderStatsView(analytics));
             showStats = false;
         } else {
-            // নোট লিস্ট ও বিস্তারিত ভিউ
             puts(Theme.ANSI_BOLD + "📋 নোটের তালিকা (Notes List):" + Theme.ANSI_RESET);
             puts(NoteList.renderNoteList(filtered, engine["activeNoteId"]));
-
             if (activeNote != null) {
                 puts(Theme.ANSI_BOLD + "📖 নির্বাচিত নোটের বিবরণ (Selected Note Detail):" + Theme.ANSI_RESET);
                 puts(NoteEditor.renderNoteDetail(activeNote));
             }
         }
-
-        // কমান্ড গাইড ও ইনপুট বার
-        puts(Theme.ANSI_FG_BRIGHT_CYAN + " কমাণ্ড তালিকা: " + Theme.ANSI_RESET +
-             Theme.ANSI_DIM + "[1-9] নোট নির্বাচন | [n] নতুন | [e] এডিট | [d] ডিলিট | [p] পিন | [f] ফেভারিট | [t] টাস্ক চেক | [+] টাস্ক যোগ | [s] সার্চ | [c] ক্যাটাগরি | [v] স্ট্যাটস | [x] এক্সপোর্ট | [q] বের হোন" + Theme.ANSI_RESET);
-
+        puts(Theme.ANSI_FG_BRIGHT_CYAN + " কমাণ্ড তালিকা: " + Theme.ANSI_RESET + Theme.ANSI_DIM + "[1-9] নোট নির্বাচন | [n] নতুন | [e] এডিট | [d] ডিলিট | [p] পিন | [f] ফেভারিট | [t] টাস্ক চেক | [+] টাস্ক যোগ | [s] সার্চ | [c] ক্যাটাগরি | [v] স্ট্যাটস | [x] এক্সপোর্ট | [q] বের হোন" + Theme.ANSI_RESET);
         let rawCmd = input(Theme.ANSI_FG_YELLOW + "❯ নোটবুক কমাণ্ড লিখুন: " + Theme.ANSI_RESET);
         if (rawCmd == null) {
-            // EOF (piped/closed stdin): quit gracefully instead of crashing
-            // on a "null" command downstream.
             running = false;
             continue;
         }
         let cmd = trim(rawCmd);
-
         if (cmd == "q" || cmd == "exit" || cmd == "quit" || cmd == "বের" || cmd == "বন্ধ") {
             running = false;
-        } else if (cmd == "n" || cmd == "new" || cmd == "নতুন") {
-            // নতুন নোট তৈরি
-            puts(Theme.ANSI_BOLD + "\n--- 📝 নতুন নোট তৈরি করুন ---" + Theme.ANSI_RESET);
-            let title = trim(safeInput("নোটের শিরোনাম: "));
-            if (title != "") {
-                let content = trim(safeInput("নোটের বিবরণ / কনটেন্ট: "));
-                let category = trim(safeInput("ক্যাটাগরি (work/personal/ideas/todo/study): "));
-                if (category == "") { category = "personal"; }
-                let tagInput = trim(safeInput("ট্যাগসমূহ (কমা দিয়ে আলাদা করুন, যেমন: বাংলা, আইডিয়া): "));
-                let tags = split(tagInput, ",");
-                let cleanTags = [];
-                let ti = 0;
-                while (ti < len(tags)) {
-                    let cleaned = trim(tags[ti]);
-                    if (cleaned != "") {
-                        cleanTags = append(cleanTags, cleaned);
-                    }
-                    ti = ti + 1;
-                }
-
-                engine = Notes.addNote(engine, title, content, category, cleanTags, "indigo", "medium", false, false, []);
-                puts(Theme.ANSI_FG_GREEN + "✅ নতুন নোট সফলভাবে যুক্ত হয়েছে!\n" + Theme.ANSI_RESET);
-            }
-        } else if (cmd == "e" || cmd == "edit" || cmd == "এডিট") {
-            // নোট এডিট করা
-            if (activeNote != null) {
-                puts(Theme.ANSI_BOLD + "\n--- ✏️ নোট পরিবর্তন (Edit Note) ---" + Theme.ANSI_RESET);
-                puts("বর্তমান শিরোনাম: " + activeNote["title"]);
-                let newTitle = trim(safeInput("নতুন শিরোনাম (খালি রাখলে অপরিবর্তিত থাকবে): "));
-                if (newTitle == "") { newTitle = activeNote["title"]; }
-
-                puts("বর্তমান কনটেন্ট: " + activeNote["content"]);
-                let newContent = trim(safeInput("নতুন কনটেন্ট (খালি রাখলে অপরিবর্তিত থাকবে): "));
-                if (newContent == "") { newContent = activeNote["content"]; }
-
-                engine = Notes.updateNote(engine, activeNote["id"], newTitle, newContent, activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], activeNote["checklist"]);
-                puts(Theme.ANSI_FG_GREEN + "✅ নোট সফলভাবে আপডেট হয়েছে!\n" + Theme.ANSI_RESET);
-            }
-        } else if (cmd == "d" || cmd == "delete" || cmd == "ডিলিট" || cmd == "মুছুন") {
-            // ডিলিট করা
-            if (activeNote != null) {
-                engine = Notes.deleteNote(engine, activeNote["id"]);
-                puts(Theme.ANSI_FG_RED + "🗑️ নোট ট্র্যাশে পাঠানো হয়েছে!\n" + Theme.ANSI_RESET);
-            }
-        } else if (cmd == "p" || cmd == "pin") {
-            // পিন টগল
-            if (activeNote != null) {
-                engine = Notes.togglePin(engine, activeNote["id"]);
-                puts(Theme.ANSI_FG_YELLOW + "📌 পিন স্ট্যাটাস পরিবর্তন হয়েছে!\n" + Theme.ANSI_RESET);
-            }
-        } else if (cmd == "f" || cmd == "fav") {
-            // ফেভারিট টগল
-            if (activeNote != null) {
-                engine = Notes.toggleFavorite(engine, activeNote["id"]);
-                puts(Theme.ANSI_FG_YELLOW + "⭐ ফেভারিট স্ট্যাটাস পরিবর্তন হয়েছে!\n" + Theme.ANSI_RESET);
-            }
-        } else if (cmd == "t" || cmd == "task") {
-            // চেকলিস্ট টাস্ক কমপ্লিট টগল
-            if (activeNote != null && len(activeNote["checklist"]) > 0) {
-                let numStr = trim(safeInput("কোন টাস্ক নম্বর টগল করবেন? (1-" + str(len(activeNote["checklist"])) + "): "));
-                if (numStr != "") {
-                    let parsed = safeParseInt(numStr);
-                    let idx = parsed - 1;
-                    if (parsed > 0 && idx >= 0 && idx < len(activeNote["checklist"])) {
-                        let targetItem = activeNote["checklist"][idx];
-                        let updatedChecks = Checklist.toggleCheckItem(activeNote["checklist"], targetItem["id"]);
-                        engine = Notes.updateNote(engine, activeNote["id"], activeNote["title"], activeNote["content"], activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], updatedChecks);
-                        puts(Theme.ANSI_FG_GREEN + "✅ টাস্কের অবস্থা হালনাগাদ হয়েছে!\n" + Theme.ANSI_RESET);
-                    } else {
-                        puts(Theme.ANSI_FG_YELLOW + "অবৈধ টাস্ক নম্বর।\n" + Theme.ANSI_RESET);
-                    }
-                }
-            } else {
-                puts(Theme.ANSI_FG_YELLOW + "এই নোটে কোনো টাস্ক নেই। নতুন টাস্ক যোগ করতে '+' চাপুন।\n" + Theme.ANSI_RESET);
-            }
-        } else if (cmd == "+" || cmd == "addtask") {
-            // নোটে নতুন চেকলিস্ট আইটেম যোগ
-            if (activeNote != null) {
-                let taskText = trim(safeInput("নতুন টাস্ক / চেকলিস্ট আইটেম লিখুন: "));
-                if (taskText != "") {
-                    let updatedChecks = Checklist.addCheckItem(activeNote["checklist"], taskText);
-                    engine = Notes.updateNote(engine, activeNote["id"], activeNote["title"], activeNote["content"], activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], updatedChecks);
-                    puts(Theme.ANSI_FG_GREEN + "✅ নতুন চেকলিস্ট আইটেম যুক্ত হয়েছে!\n" + Theme.ANSI_RESET);
-                }
-            }
-        } else if (cmd == "s" || cmd == "search") {
-            // সার্চ
-            let q = trim(safeInput("অনুসন্ধান শব্দ লিখুন (রিসেট করতে এন্টার চাপুন): "));
-            engine["searchQuery"] = q;
-        } else if (cmd == "c" || cmd == "cat") {
-            // ক্যাটাগরি ফিল্টার
-            puts(Theme.ANSI_BOLD + "\nক্যাটাগরি বাছুন:" + Theme.ANSI_RESET);
-            puts("  [1] all (সকল নোট)");
-            puts("  [2] important (জরুরি)");
-            puts("  [3] work (কাজ)");
-            puts("  [4] personal (ব্যক্তিগত)");
-            puts("  [5] ideas (আইডিয়া)");
-            puts("  [6] todo (চেকলিস্ট)");
-            puts("  [7] archive (আর্কাইভ)");
-            puts("  [8] trash (ট্র্যাশ)");
-            let catChoice = trim(safeInput("ক্যাটাগরি নম্বর বা নাম লিখুন: "));
-            if (catChoice == "1" || catChoice == "all") { engine["activeCategory"] = "all"; }
-            else if (catChoice == "2" || catChoice == "important") { engine["activeCategory"] = "important"; }
-            else if (catChoice == "3" || catChoice == "work") { engine["activeCategory"] = "work"; }
-            else if (catChoice == "4" || catChoice == "personal") { engine["activeCategory"] = "personal"; }
-            else if (catChoice == "5" || catChoice == "ideas") { engine["activeCategory"] = "ideas"; }
-            else if (catChoice == "6" || catChoice == "todo") { engine["activeCategory"] = "todo"; }
-            else if (catChoice == "7" || catChoice == "archive") { engine["activeCategory"] = "archive"; }
-            else if (catChoice == "8" || catChoice == "trash") { engine["activeCategory"] = "trash"; }
-        } else if (cmd == "v" || cmd == "stats") {
-            showStats = true;
-        } else if (cmd == "x" || cmd == "export") {
-            // ডেটাবেস ও ব্যাকআপ এক্সপোর্ট
-            let ok = Storage.saveNotesToFile(engine["notes"], "notes_backup.json");
-            if (ok) {
-                puts(Theme.ANSI_FG_GREEN + "✅ নোটবুক ডেটা 'notes_backup.json'-এ সফলভাবে সংরক্ষিত হয়েছে!\n" + Theme.ANSI_RESET);
-            } else {
-                puts(Theme.ANSI_FG_RED + "❌ ব্যাকআপ সংরক্ষণ ব্যর্থ হয়েছে।\n" + Theme.ANSI_RESET);
-            }
-        } else if (cmd == "") {
-            // খালি এন্টার চাপলে স্ক্রিন রিফ্রেশ হবে
         } else {
-            // সংখ্যা ইনপুট হলে সেই নম্বরের নোট সিলেক্ট করা
-            let idx = safeParseInt(cmd);
-            if (idx >= 1 && idx <= len(filtered)) {
-                engine["activeNoteId"] = filtered[idx - 1]["id"];
-                puts(Theme.ANSI_FG_GREEN + "নোট নির্বাচিত: " + filtered[idx - 1]["title"] + "\n" + Theme.ANSI_RESET);
+            if (cmd == "n" || cmd == "new" || cmd == "নতুন") {
+                puts(Theme.ANSI_BOLD + "\n--- 📝 নতুন নোট তৈরি করুন ---" + Theme.ANSI_RESET);
+                let title = trim(safeInput("নোটের শিরোনাম: "));
+                if (title != "") {
+                    let content = trim(safeInput("নোটের বিবরণ / কনটেন্ট: "));
+                    let category = trim(safeInput("ক্যাটাগরি (work/personal/ideas/todo/study): "));
+                    if (category == "") {
+                        category = "personal";
+                    }
+                    let tagInput = trim(safeInput("ট্যাগসমূহ (কমা দিয়ে আলাদা করুন, যেমন: বাংলা, আইডিয়া): "));
+                    let tags = split(tagInput, ",");
+                    let cleanTags = [];
+                    let ti = 0;
+                    while (ti < len(tags)) {
+                        let cleaned = trim(tags[ti]);
+                        if (cleaned != "") {
+                            cleanTags = append(cleanTags, cleaned);
+                        }
+                        ti = ti + 1;
+                    }
+                    engine = Notes.addNote(engine, title, content, category, cleanTags, "indigo", "medium", false, false, []);
+                    puts(Theme.ANSI_FG_GREEN + "✅ নতুন নোট সফলভাবে যুক্ত হয়েছে!\n" + Theme.ANSI_RESET);
+                }
             } else {
-                puts("অবৈধ কমাণ্ড।\n");
+                if (cmd == "e" || cmd == "edit" || cmd == "এডিট") {
+                    if (activeNote != null) {
+                        puts(Theme.ANSI_BOLD + "\n--- ✏️ নোট পরিবর্তন (Edit Note) ---" + Theme.ANSI_RESET);
+                        puts("বর্তমান শিরোনাম: " + activeNote["title"]);
+                        let newTitle = trim(safeInput("নতুন শিরোনাম (খালি রাখলে অপরিবর্তিত থাকবে): "));
+                        if (newTitle == "") {
+                            newTitle = activeNote["title"];
+                        }
+                        puts("বর্তমান কনটেন্ট: " + activeNote["content"]);
+                        let newContent = trim(safeInput("নতুন কনটেন্ট (খালি রাখলে অপরিবর্তিত থাকবে): "));
+                        if (newContent == "") {
+                            newContent = activeNote["content"];
+                        }
+                        engine = Notes.updateNote(engine, activeNote["id"], newTitle, newContent, activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], activeNote["checklist"]);
+                        puts(Theme.ANSI_FG_GREEN + "✅ নোট সফলভাবে আপডেট হয়েছে!\n" + Theme.ANSI_RESET);
+                    }
+                } else {
+                    if (cmd == "d" || cmd == "delete" || cmd == "ডিলিট" || cmd == "মুছুন") {
+                        if (activeNote != null) {
+                            engine = Notes.deleteNote(engine, activeNote["id"]);
+                            puts(Theme.ANSI_FG_RED + "🗑️ নোট ট্র্যাশে পাঠানো হয়েছে!\n" + Theme.ANSI_RESET);
+                        }
+                    } else {
+                        if (cmd == "p" || cmd == "pin") {
+                            if (activeNote != null) {
+                                engine = Notes.togglePin(engine, activeNote["id"]);
+                                puts(Theme.ANSI_FG_YELLOW + "📌 পিন স্ট্যাটাস পরিবর্তন হয়েছে!\n" + Theme.ANSI_RESET);
+                            }
+                        } else {
+                            if (cmd == "f" || cmd == "fav") {
+                                if (activeNote != null) {
+                                    engine = Notes.toggleFavorite(engine, activeNote["id"]);
+                                    puts(Theme.ANSI_FG_YELLOW + "⭐ ফেভারিট স্ট্যাটাস পরিবর্তন হয়েছে!\n" + Theme.ANSI_RESET);
+                                }
+                            } else {
+                                if (cmd == "t" || cmd == "task") {
+                                    if (activeNote != null && len(activeNote["checklist"]) > 0) {
+                                        let numStr = trim(safeInput("কোন টাস্ক নম্বর টগল করবেন? (1-" + str(len(activeNote["checklist"])) + "): "));
+                                        if (numStr != "") {
+                                            let parsed = safeParseInt(numStr);
+                                            let idx = parsed - 1;
+                                            if (parsed > 0 && idx >= 0 && idx < len(activeNote["checklist"])) {
+                                                let targetItem = activeNote["checklist"][idx];
+                                                let updatedChecks = Checklist.toggleCheckItem(activeNote["checklist"], targetItem["id"]);
+                                                engine = Notes.updateNote(engine, activeNote["id"], activeNote["title"], activeNote["content"], activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], updatedChecks);
+                                                puts(Theme.ANSI_FG_GREEN + "✅ টাস্কের অবস্থা হালনাগাদ হয়েছে!\n" + Theme.ANSI_RESET);
+                                            } else {
+                                                puts(Theme.ANSI_FG_YELLOW + "অবৈধ টাস্ক নম্বর।\n" + Theme.ANSI_RESET);
+                                            }
+                                        }
+                                    } else {
+                                        puts(Theme.ANSI_FG_YELLOW + "এই নোটে কোনো টাস্ক নেই। নতুন টাস্ক যোগ করতে '+' চাপুন।\n" + Theme.ANSI_RESET);
+                                    }
+                                } else {
+                                    if (cmd == "+" || cmd == "addtask") {
+                                        if (activeNote != null) {
+                                            let taskText = trim(safeInput("নতুন টাস্ক / চেকলিস্ট আইটেম লিখুন: "));
+                                            if (taskText != "") {
+                                                let updatedChecks = Checklist.addCheckItem(activeNote["checklist"], taskText);
+                                                engine = Notes.updateNote(engine, activeNote["id"], activeNote["title"], activeNote["content"], activeNote["category"], activeNote["tags"], activeNote["color"], activeNote["priority"], activeNote["isPinned"], activeNote["isFavorite"], updatedChecks);
+                                                puts(Theme.ANSI_FG_GREEN + "✅ নতুন চেকলিস্ট আইটেম যুক্ত হয়েছে!\n" + Theme.ANSI_RESET);
+                                            }
+                                        }
+                                    } else {
+                                        if (cmd == "s" || cmd == "search") {
+                                            let q = trim(safeInput("অনুসন্ধান শব্দ লিখুন (রিসেট করতে এন্টার চাপুন): "));
+                                            engine["searchQuery"] = q;
+                                        } else {
+                                            if (cmd == "c" || cmd == "cat") {
+                                                puts(Theme.ANSI_BOLD + "\nক্যাটাগরি বাছুন:" + Theme.ANSI_RESET);
+                                                puts("  [1] all (সকল নোট)");
+                                                puts("  [2] important (জরুরি)");
+                                                puts("  [3] work (কাজ)");
+                                                puts("  [4] personal (ব্যক্তিগত)");
+                                                puts("  [5] ideas (আইডিয়া)");
+                                                puts("  [6] todo (চেকলিস্ট)");
+                                                puts("  [7] archive (আর্কাইভ)");
+                                                puts("  [8] trash (ট্র্যাশ)");
+                                                let catChoice = trim(safeInput("ক্যাটাগরি নম্বর বা নাম লিখুন: "));
+                                                if (catChoice == "1" || catChoice == "all") {
+                                                    engine["activeCategory"] = "all";
+                                                } else {
+                                                    if (catChoice == "2" || catChoice == "important") {
+                                                        engine["activeCategory"] = "important";
+                                                    } else {
+                                                        if (catChoice == "3" || catChoice == "work") {
+                                                            engine["activeCategory"] = "work";
+                                                        } else {
+                                                            if (catChoice == "4" || catChoice == "personal") {
+                                                                engine["activeCategory"] = "personal";
+                                                            } else {
+                                                                if (catChoice == "5" || catChoice == "ideas") {
+                                                                    engine["activeCategory"] = "ideas";
+                                                                } else {
+                                                                    if (catChoice == "6" || catChoice == "todo") {
+                                                                        engine["activeCategory"] = "todo";
+                                                                    } else {
+                                                                        if (catChoice == "7" || catChoice == "archive") {
+                                                                            engine["activeCategory"] = "archive";
+                                                                        } else {
+                                                                            if (catChoice == "8" || catChoice == "trash") {
+                                                                                engine["activeCategory"] = "trash";
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                if (cmd == "v" || cmd == "stats") {
+                                                    showStats = true;
+                                                } else {
+                                                    if (cmd == "x" || cmd == "export") {
+                                                        let ok = Storage.saveNotesToFile(engine["notes"], "notes_backup.json");
+                                                        if (ok) {
+                                                            puts(Theme.ANSI_FG_GREEN + "✅ নোটবুক ডেটা 'notes_backup.json'-এ সফলভাবে সংরক্ষিত হয়েছে!\n" + Theme.ANSI_RESET);
+                                                        } else {
+                                                            puts(Theme.ANSI_FG_RED + "❌ ব্যাকআপ সংরক্ষণ ব্যর্থ হয়েছে।\n" + Theme.ANSI_RESET);
+                                                        }
+                                                    } else {
+                                                        if (cmd == "") {
+                                                        } else {
+                                                            let idx = safeParseInt(cmd);
+                                                            if (idx >= 1 && idx <= len(filtered)) {
+                                                                engine["activeNoteId"] = filtered[idx - 1]["id"];
+                                                                puts(Theme.ANSI_FG_GREEN + "নোট নির্বাচিত: " + filtered[idx - 1]["title"] + "\n" + Theme.ANSI_RESET);
+                                                            } else {
+                                                                puts("অবৈধ কমাণ্ড।\n");
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
-
     puts(Theme.ANSI_FG_BRIGHT_CYAN + "\n👋 নীলাং নোটবুক সফলভাবে বন্ধ হয়েছে। ধন্যবাদ!" + Theme.ANSI_RESET);
 };
-
-// অ্যাপ চালানো
 main();
