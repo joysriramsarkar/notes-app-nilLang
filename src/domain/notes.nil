@@ -3,8 +3,16 @@ import "./checklist.nil" as Checklist;
 import "./markdown.nil" as Markdown;
 import "./storage.nil" as Storage;
 let createNotesEngine = fn() {
-    let seed = Storage.getSeedNotes();
-    return {"notes": seed, "activeNoteId": "note-1", "activeCategory": "all", "searchQuery": "", "selectedTag": "", "theme": "dark", "filePath": "notes.json"};
+    let loaded = Storage.loadNotesFromFile("notes.json");
+    let initial = loaded;
+    if (initial == null) {
+        initial = Storage.getSeedNotes();
+    }
+    let firstId = "note-1";
+    if (len(initial) > 0) {
+        firstId = initial[0]["id"];
+    }
+    return {"notes": initial, "activeNoteId": firstId, "activeCategory": "all", "searchQuery": "", "selectedTag": "", "theme": "dark", "filePath": "notes.json"};
 };
 let getCount = fn(engine) {
     return len(engine["notes"]);

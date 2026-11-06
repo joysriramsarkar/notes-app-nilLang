@@ -25,6 +25,14 @@ let getSeedNotes = fn() {
     notes = append(notes, n4);
     return notes;
 };
+let escapeJSON = fn(s) {
+    let out = replace(s, "\\", "\\\\");
+    out = replace(out, "\"", "\\\"");
+    out = replace(out, "\r", "\\r");
+    out = replace(out, "\t", "\\t");
+    out = replace(out, "\n", "\\n");
+    return out;
+};
 let notesToJSON = fn(notes) {
     let out = "[\n";
     let i = 0;
@@ -32,8 +40,8 @@ let notesToJSON = fn(notes) {
         let n = notes[i];
         out = out + "  {\n";
         out = out + "    \"id\": \"" + n["id"] + "\",\n";
-        out = out + "    \"title\": \"" + replace(n["title"], "\"", "\\\"") + "\",\n";
-        out = out + "    \"content\": \"" + replace(replace(n["content"], "\n", "\\n"), "\"", "\\\"") + "\",\n";
+        out = out + "    \"title\": \"" + escapeJSON(n["title"]) + "\",\n";
+        out = out + "    \"content\": \"" + escapeJSON(n["content"]) + "\",\n";
         out = out + "    \"category\": \"" + n["category"] + "\",\n";
         out = out + "    \"color\": \"" + n["color"] + "\",\n";
         out = out + "    \"priority\": \"" + n["priority"] + "\",\n";
@@ -62,7 +70,7 @@ let notesToJSON = fn(notes) {
         out = out + "    \"tags\": [";
         let t = 0;
         while (t < len(n["tags"])) {
-            out = out + "\"" + n["tags"][t] + "\"";
+            out = out + "\"" + escapeJSON(n["tags"][t]) + "\"";
             if (t + 1 < len(n["tags"])) {
                 out = out + ", ";
             }
@@ -74,7 +82,7 @@ let notesToJSON = fn(notes) {
         let checks = n["checklist"];
         while (c < len(checks)) {
             let item = checks[c];
-            out = out + "      {\"id\": \"" + item["id"] + "\", \"text\": \"" + replace(item["text"], "\"", "\\\"") + "\", \"completed\": " + if (item["completed"]) {
+            out = out + "      {\"id\": \"" + item["id"] + "\", \"text\": \"" + escapeJSON(item["text"]) + "\", \"completed\": " + if (item["completed"]) {
                 "true";
             } else {
                 "false";
@@ -99,4 +107,20 @@ let notesToJSON = fn(notes) {
 let saveNotesToFile = fn(notes, filePath) {
     let jsonContent = notesToJSON(notes);
     return writeFile(filePath, jsonContent);
+};
+
+let loadNotesFromFile = fn(filePath) {
+    // Load persisted notes.json when it exists; fall back to seeds otherwise.
+    if (!fileExists(filePath)) {
+        return null;
+    }
+    let raw = readFile(filePath);
+    if (raw == null || len(trim(raw)) == 0) {
+        return null;
+    }
+    let parsed = native("std.json.decode", raw);
+    if (parsed == null || len(parsed) == 0) {
+        return null;
+    }
+    return parsed;
 };

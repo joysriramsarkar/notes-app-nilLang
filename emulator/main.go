@@ -42,7 +42,7 @@ func main() {
 	fs := http.FileServer(http.Dir(publicDir))
 	http.Handle("/", fs)
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf("127.0.0.1:%d", port), nil); err != nil {
 		log.Printf("সার্ভার ইতোমধ্যে ব্যাকগ্রাউন্ডে চলছে অথবা পোর্ট দখলকৃত: %v", err)
 	}
 }

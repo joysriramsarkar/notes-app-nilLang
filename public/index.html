@@ -308,6 +308,9 @@
   </footer>
 
   <script>
+    function escapeHtml(v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
     let notes = [];
     let activeCategory = 'all';
     let activeNoteId = null;
@@ -359,8 +362,8 @@
       const filtered = getFiltered();
       list.innerHTML = filtered.map(n => `
         <div class="note-card ${n.id === activeNoteId ? 'active' : ''}" onclick="selectNote('${n.id}')">
-          <h4>${n.isPinned ? '📌 ' : ''}${n.isFavorite ? '⭐ ' : ''}${n.title}</h4>
-          <p>${n.content || ''}</p>
+          <h4>${n.isPinned ? '📌 ' : ''}${n.isFavorite ? '⭐ ' : ''}${escapeHtml(n.title)}</h4>
+          <p>${escapeHtml(n.content || '')}</p>
         </div>
       `).join('');
     }
@@ -390,7 +393,7 @@
       document.getElementById('checklistContainer').innerHTML = checks.map(c => `
         <label class="check-item">
           <input type="checkbox" ${c.completed ? 'checked' : ''} onchange="toggleCheck('${c.id}')" />
-          <span style="${c.completed ? 'text-decoration:line-through;color:#64748b;' : ''}">${c.text}</span>
+          <span style="${c.completed ? 'text-decoration:line-through;color:#64748b;' : ''}">${escapeHtml(c.text)}</span>
         </label>
       `).join('');
     }

@@ -55,9 +55,8 @@ notes-app-nilLang/
 │   ├── make_boot_image.go    # x86 বুটেবল ওএস ইমেজ জেনারেটর
 │   └── notes-os.img          # বুটেবল ভার্চুয়াল ওএস ইমেজ (1.44MB)
 ├── public/
-│   ├── index.html            # আধুনিক গ্লাস-মরফিজম ওয়েব UI
-│   ├── styles.css            # আল্ট্রা-মডার্ন ডার্ক ডিজাইন সিস্টেম
-│   └── app.js                # রিঅ্যাক্টিভ ক্লায়েন্ট লজিক ও API সিঙ্ক
+│   ├── index.html            # আধুনিক ওয়েব UI (inline styles/scripts)
+│   └── device.html           # NilOS ডিভাইস এমুলেটর পেজ
 ├── tests/
 │   └── notes_test.go         # Go টেস্ট সুইট (CRUD, QEMU, Engine)
 ├── main.go                   # লোকাল ডেস্কটপ ও API সার্ভার
@@ -112,7 +111,7 @@ cd "c:\Users\joysr\Documents\programming language\notes-app-nilLang"
 ### ৩. 📱 নীল ওএস (NilOS) রিয়ালিস্টিক টাচ এমুলেটরে চালানো
 
 মোবাইল ও ট্যাবলেট ওএস-এর মতো সম্পূর্ণ টাচস্ক্রিন ডিভাইসে নোটবুক চালাতে:
-- সরাসরি ডাবল-ক্লিক করুন: [launch-device-emulator.bat](file:///c:/Users/joysr/Documents/programming%20language/notes-app-nilLang/launch-device-emulator.bat)
+- সরাসরি ডাবল-ক্লিক করুন: [launch-native-emulator.bat](file:///c:/Users/joysr/Documents/programming%20language/notes-app-nilLang/launch-native-emulator.bat)
 - অথবা ব্রাউজারে খুলুন: **http://localhost:8085/device.html**
 
 **টাচ ডিভাইস ফিচারসমূহ:**
@@ -138,12 +137,12 @@ go run .
 
 ```powershell
 cd "c:\Users\joysr\Documents\programming language\notes-app-nilLang"
-go test -v ./tests
+go test ./...
 ```
 
 ---
 
 ## 📜 লাইসেন্স
 
-MIT License © 2026 Joy Sriram Sarkar
+AGPL-3.0 License © 2026 Joy Sriram Sarkar
 

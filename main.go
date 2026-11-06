@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -339,10 +340,11 @@ func handleEmulatorPackages(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(pkgs)
 }
 
+// isAllowedLocalOrigin is strict for exec/mutating endpoints: empty Origin must NOT pass.
 func isAllowedLocalOrigin(r *http.Request) bool {
 	origin := r.Header.Get("Origin")
 	if origin == "" {
-		return true
+		return false
 	}
 	return strings.HasPrefix(origin, "http://localhost:") ||
 		strings.HasPrefix(origin, "http://127.0.0.1:") ||
@@ -350,15 +352,35 @@ func isAllowedLocalOrigin(r *http.Request) bool {
 		origin == "http://127.0.0.1"
 }
 
-func handleEmulatorTerminal(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
+// requireExecAuth guards terminal/qemu/nilang execution endpoints.
+// If NOTES_API_TOKEN is set, require X-Notes-Token (or Bearer) match; otherwise POST + strict local Origin.
+func requireExecAuth(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
+		return false
+	}
+	if tok := os.Getenv("NOTES_API_TOKEN"); tok != "" {
+		got := r.Header.Get("X-Notes-Token")
+		if got == "" {
+			got = strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+		}
+		if len(got) != len(tok) || subtle.ConstantTimeCompare([]byte(got), []byte(tok)) != 1 {
+			http.Error(w, "Forbidden", http.StatusForbidden)
+			return false
+		}
+		return true
 	}
 	if !isAllowedLocalOrigin(r) {
 		http.Error(w, "Forbidden cross-origin request", http.StatusForbidden)
+		return false
+	}
+	return true
+}
+
+func handleEmulatorTerminal(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if !requireExecAuth(w, r) {
 		return
 	}
 
@@ -563,6 +585,9 @@ func handleFilesBrowse(w http.ResponseWriter, r *http.Request) {
 // ─── QEMU & Nilang Legacy Handlers ────────────────────────────────────
 func handleLaunchQEMU(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	if !requireExecAuth(w, r) {
+		return
+	}
 
 	qemuPath := os.Getenv("QEMU_PATH")
 	if qemuPath == "" {
@@ -596,6 +621,9 @@ func handleLaunchQEMU(w http.ResponseWriter, r *http.Request) {
 
 func handleRunNilang(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	if !requireExecAuth(w, r) {
+		return
+	}
 
 	nilBin := os.Getenv("NIL_BIN")
 	if nilBin == "" {
@@ -605,7 +633,9 @@ func handleRunNilang(w http.ResponseWriter, r *http.Request) {
 		nilBin = "nil"
 	}
 
-	cmd := exec.Command(nilBin, "run", "src/main.nil")
+	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, nilBin, "run", "src/main.nil")
 	cmd.Stdin = strings.NewReader("v\nq\n")
 	out, err := cmd.CombinedOutput()
 
