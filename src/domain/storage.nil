@@ -108,9 +108,7 @@ let saveNotesToFile = fn(notes, filePath) {
     let jsonContent = notesToJSON(notes);
     return writeFile(filePath, jsonContent);
 };
-
 let loadNotesFromFile = fn(filePath) {
-    // Load persisted notes.json when it exists; fall back to seeds otherwise.
     if (!fileExists(filePath)) {
         return null;
     }
